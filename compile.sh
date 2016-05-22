@@ -1,0 +1,1 @@
+lein compile &&  lein uberjar
