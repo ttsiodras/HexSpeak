@@ -27,14 +27,13 @@
         (let [new-phrase (str current-phrase w)
               new-used (conj used w)]
           (if (= i (- targetLength current-len))
-            (recur (conj new-solutions new-phrase)
-            ;(printf "%s %s+%s = %s %d\n"
-            ;        used
-            ;        current-phrase
-            ;        w
-            ;        ; (clojure.string/replace new-phrase #"o|i|l" { "o" "0" "i" "1" "l" "7" })
-            ;        new-phrase
-            ;        i)
+            (printf "%s %s+%s = %s %d\n"
+                    used
+                    current-phrase
+                    w
+                    ; (clojure.string/replace new-phrase #"o|i|l" { "o" "0" "i" "1" "l" "7" })
+                    new-phrase
+                    i)
             (solve words-per-length new-phrase (+ current-len i) new-used)))))))
 
 (defn -main [& args]
@@ -42,5 +41,4 @@
     (do
       (printf "Using %d categories...\n" (count words-per-length))
       (let [useless (doall (solve words-per-length "" 0 #{}))]
-        (doall useless)))))
-;        ))))
+        (println useless)))))
