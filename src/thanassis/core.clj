@@ -14,10 +14,17 @@
                      (good-words rdr letters))]
     (group-by #(.length %) (concat candidates ["a"]))))
 
+
+(defn lazy-cat' [colls]
+  (lazy-seq
+    (if (seq colls)
+      (concat (first colls) (lazy-cat' (next colls))))))
+
+
 (defn solve [words-per-length target-length phrase phrase-len used-words results]
   (if (= target-length phrase-len)
-    (conj results phrase)
-    (apply concat (for [i (range 1 (inc (- target-length phrase-len)))
+    (cons phrase results)
+    (lazy-cat' (for [i (range 1 (inc (- target-length phrase-len)))
                         w (get words-per-length i [])
                         :when (not (contains? used-words w))]
                     (solve words-per-length target-length (str phrase w) (+ phrase-len i) (conj used-words w) results)))))
