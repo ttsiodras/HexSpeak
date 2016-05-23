@@ -1,7 +1,7 @@
 (ns thanassis.core
   (:gen-class))
 
-(def targetLength 8)
+(def targetLength 1)
 
 (defn good-words [rdr]
   (let [letters "abcdef01"
@@ -15,30 +15,24 @@
 (defn get-words-per-length []
   (let [input-file "/usr/share/dict/words"
         candidates (with-open [rdr (clojure.java.io/reader input-file)]
-                     (good-words rdr))
-        words-per-length (group-by #(.length %) (concat candidates ["a"]))]
-    words-per-length))
+                     (good-words rdr))]
+    (group-by #(.length %) (concat candidates ["a"]))))
 
-(defn solve [words-per-length current-phrase current-len used]
-  (for [i (range 1 (inc (- targetLength current-len)))
-        words (get words-per-length i [])]
-    (loop [w words new-solutions []]
-      (if-not (contains? used w)
-        (let [new-phrase (str current-phrase w)
-              new-used (conj used w)]
-          (if (= i (- targetLength current-len))
-            (printf "%s %s+%s = %s %d\n"
-                    used
-                    current-phrase
-                    w
-                    ; (clojure.string/replace new-phrase #"o|i|l" { "o" "0" "i" "1" "l" "7" })
-                    new-phrase
-                    i)
-            (solve words-per-length new-phrase (+ current-len i) new-used)))))))
+(defn solve [words-per-length phrase phrase-len used solutions]
+  (if (= targetLength phrase-len)
+    (cons phrase solutions)
+    (let
+      [res (for [i (range 1 (inc (- targetLength phrase-len)))
+               words (get words-per-length i [])
+               w words
+               :when (not (contains? used w))]
+           (solve words-per-length (str phrase w) (+ phrase-len i) (conj used w) solutions))]
+      (do
+        (printf "%s\n" (doall res))
+        (apply concat res)))))
 
 (defn -main [& args]
-  (let [words-per-length (get-words-per-length)]
-    (do
-      (printf "Using %d categories...\n" (count words-per-length))
-      (let [useless (doall (solve words-per-length "" 0 #{}))]
-        (println useless)))))
+  (do
+    (for [phrase (solve (get-words-per-length) "" 0 #{} [])]
+      (printf "%s\n" phrase))
+    (println)))
