@@ -3,11 +3,12 @@
   (:gen-class))
 
 (defn good-words [rdr letters]
-  (let [matcher (re-pattern (str "^[" letters "]*$"))]
+  (let [matcher (re-pattern (str "^[" letters "]*$"))
+        forbidden #{"aaa" "aba" "abc"}]
     (doall (->> (line-seq rdr)
                 (filter #(and (> (.length %) 2)
                               (re-matches matcher %)
-                              (not (contains? #{"aaa" "aba" "abc"}  %))))))))
+                              (not (contains? forbidden %))))))))
 
 (defn get-words-per-length [letters]
   (let [input-file "/usr/share/dict/words"
@@ -22,12 +23,12 @@
     (reduce into []
             (for [i (range 1 (inc (- target-length phrase-len)))
                   w (get words-per-length i [])
-                  :when (not (contains? used-words w))]
+                  :when (nil? (some #{w} used-words))]
               (solve words-per-length
                      target-length
                      (str phrase w)
                      (+ phrase-len i)
-                     (conj used-words w)
+                     (cons w used-words)
                      results)))))
 
 (defn -main [& args]
@@ -35,7 +36,7 @@
         f2 (second args)
         phrase-length (if (nil? f1) 4 (Integer. (re-find #"\d+" f1)))
         letters (if (nil? f2) "abcdef" f2)
-        res (solve (get-words-per-length letters) phrase-length "" 0 #{} [])]
+        res (solve (get-words-per-length letters) phrase-length "" 0 () [])]
     (do
       (if (= (System/getenv "SHOWALL") "1")
         (doall (map #(printf "%s\n" %) res))
