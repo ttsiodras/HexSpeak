@@ -1,4 +1,5 @@
 (ns thanassis.core
+  (:require [clj-getrusage.core :refer (getrusage)])
   (:gen-class))
 
 (defn good-words [rdr letters]
@@ -14,20 +15,20 @@
                      (good-words rdr letters))]
     (group-by #(.length %) (concat candidates ["a"]))))
 
-
-(defn lazy-cat' [colls]
-  (lazy-seq
-    (if (seq colls)
-      (concat (first colls) (lazy-cat' (next colls))))))
-
-
-(defn solve [words-per-length target-length phrase phrase-len used-words results]
+(defn solve
+  [words-per-length target-length phrase phrase-len used-words results]
   (if (= target-length phrase-len)
     (cons phrase results)
-    (lazy-cat' (for [i (range 1 (inc (- target-length phrase-len)))
-                        w (get words-per-length i [])
-                        :when (not (contains? used-words w))]
-                    (solve words-per-length target-length (str phrase w) (+ phrase-len i) (conj used-words w) results)))))
+    (reduce into []
+            (for [i (range 1 (inc (- target-length phrase-len)))
+                  w (get words-per-length i [])
+                  :when (not (contains? used-words w))]
+              (solve words-per-length
+                     target-length
+                     (str phrase w)
+                     (+ phrase-len i)
+                     (conj used-words w)
+                     results)))))
 
 (defn -main [& args]
   (let [f1 (first args)
@@ -39,4 +40,5 @@
       (if (= (System/getenv "SHOWALL") "1")
         (doall (map #(printf "%s\n" %) res))
         (printf "Total: %d\n" (count res)))
+      (printf "%s KB" (get (getrusage) :maxrss))
       (flush))))
