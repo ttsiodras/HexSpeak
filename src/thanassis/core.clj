@@ -7,7 +7,7 @@
   (let [letters "abcdef01"
         matcher (re-pattern (str "^[" letters "]*$"))]
     (doall (->> (line-seq rdr)
-                (map #(.toLowerCase %))
+                ;(map #(.toLowerCase %))
                 (filter #(and (> (.length %) 2)
                               (re-matches matcher %)
                               (not (contains? #{"aaa" "aba" "abc"}  %))))))))
@@ -18,21 +18,15 @@
                      (good-words rdr))]
     (group-by #(.length %) (concat candidates ["a"]))))
 
-(defn solve [words-per-length phrase phrase-len used solutions]
+(defn solve [words-per-length phrase phrase-len used-words]
   (if (= targetLength phrase-len)
-    (cons phrase solutions)
-    (let
-      [res (for [i (range 1 (inc (- targetLength phrase-len)))
-               words (get words-per-length i [])
-               w words
-               :when (not (contains? used w))]
-           (solve words-per-length (str phrase w) (+ phrase-len i) (conj used w) solutions))]
-      (do
-        (printf "%s\n" (doall res))
-        (apply concat res)))))
+    (printf "%s %s\n" used-words phrase)
+    (for [i (range 1 (inc (- targetLength phrase-len)))
+          w (get words-per-length i [])
+          :when (not (contains? used-words w))]
+      (solve words-per-length (str phrase w) (+ phrase-len i) (conj used-words w)))))
 
 (defn -main [& args]
   (do
-    (for [phrase (solve (get-words-per-length) "" 0 #{} [])]
-      (printf "%s\n" phrase))
+    (solve (get-words-per-length) "" 0 #{})
     (println)))
