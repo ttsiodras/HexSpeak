@@ -1,5 +1,4 @@
 (ns thanassis.core
-  (:require [clj-getrusage.core :refer (getrusage)])
   (:gen-class))
 
 (set! *warn-on-reflection* true)
@@ -16,39 +15,33 @@
 (defn get-words-per-length [letters]
   (let [input-file "/usr/share/dict/words"
         candidates (with-open [rdr (clojure.java.io/reader input-file)]
-                     (good-words rdr letters))]
-    (group-by #(.length ^String %) (concat candidates ["a"]))))
-
-(def words-per-length (get-words-per-length "abcdef"))
-(def target-length 15)
+                     (good-words rdr letters))
+        in-map-form (group-by #(.length ^String %)
+                              (concat candidates ["a"]))
+        max-length (inc (reduce max (keys in-map-form)))]
+    (into [] (map #(get in-map-form % []) (range max-length)))))
 
 (defn solve
-  ; [words-per-length target-length phrase phrase-len used-words results]
-  [words-per-length target-length phrase-len used-words results]
+  [words-per-length target-length phrase-len used-words counter]
   (if (= target-length phrase-len)
-    (+ 1 results)
-    (reduce + 0
-            (for [i (range 1 (inc (- target-length phrase-len)))
-                  w (get words-per-length i [])
-                  :when (not (contains? used-words w))]
-              (solve 
-                words-per-length
-                target-length
-                ;(str phrase w)
-                (+ phrase-len i)
-                (conj used-words w)
-                results)))))
+    (swap! counter inc)
+    (dotimes [i (- target-length phrase-len)]
+      (doseq [w (get words-per-length (inc i) [])]
+        (if (not (contains? used-words w))
+          (solve words-per-length target-length (+ phrase-len (inc i)) (conj used-words w) counter))))))
 
 (defn -main [& args]
   (let [f1 (first args)
         f2 (second args)
         phrase-length (if (nil? f1) 4 (Integer. ^String (re-find #"\d+" f1)))
         letters (if (nil? f2) "abcdef" f2)
-        res (solve (get-words-per-length letters) phrase-length 0 #{} 0)]
-    (do
+        counter (atom 0)
+        words-per-length (get-words-per-length letters)]
+    (dotimes [n 10]
+      (do
+        (reset! counter 0)
+        (time (solve words-per-length phrase-length 0 #{} counter))
       ;(if (= (System/getenv "SHOWALL") "1")
         ; (doall (map #(printf "%s\n" %) res))
-        ;(printf "Total: %d, mem used: %s KB\n" (count res) (get (getrusage) :maxrss)))
-        ;(printf "%d\n" res)
-        (printf "Total: %d, mem used: %s KB\n" res (get (getrusage) :maxrss))
-      (flush))))
+        (printf "Total: %d\n" @counter)))
+      (flush)))
