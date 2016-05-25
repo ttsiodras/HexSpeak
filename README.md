@@ -194,7 +194,6 @@ All 3 report the same number of 14-length HexSpeak phrases:
     spawn java -jar target/uberjar/thanassis-0.1.0-SNAPSHOT-standalone.jar 14 abcdef
     "Elapsed time: 1622.970973 msecs"
     Total: 3020796
-    "Elapsed time: 1288.862498 msecs"
     
     Java tested successfully!
     
