@@ -110,11 +110,14 @@ Both of the implementations are equally succinct.
 
 ## Step 3: Speed!
 
-My Makefile has a `bench` rule, that measures 10 runs in CPython and Pypy
+I added a `bench` rule in my Makefile, that measures 10 runs in CPython and Pypy
 (via bash's `time`) and 10 executions in one run inside the JVM (via Clojure's
-`time`, to avoid the JVM's startup cost and also warm-up the HotSpot technology.
+`time`, to avoid the JVM's startup cost and also warm-up the HotSpot technology).
 
-Times in the JVM are in milliseconds - in the other two, it's just seconds:
+Times in the JVM are in milliseconds - in the other two, it's just seconds.
+
+*(Note: the benchmarking depends on my [stats.py](https://github.com/ttsiodras/utils/blob/master/stats.py)
+being in the PATH)*.
 
 So, Python first...
 
