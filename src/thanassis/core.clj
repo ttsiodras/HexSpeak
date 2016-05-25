@@ -41,7 +41,6 @@
       (do
         (reset! counter 0)
         (time (solve words-per-length phrase-length 0 #{} counter))
-      ;(if (= (System/getenv "SHOWALL") "1")
-        ; (doall (map #(printf "%s\n" %) res))
+        ;(doall (map #(printf "%s\n" %) res))
         (printf "Total: %d\n" @counter)))
-      (flush)))
+        (flush)))

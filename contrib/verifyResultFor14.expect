@@ -1,0 +1,8 @@
+#!/usr/bin/env expect
+set timeout 20
+spawn java -jar target/uberjar/thanassis-0.1.0-SNAPSHOT-standalone.jar 14 abcdef
+expect {
+  timeout { send_user "\nFailed test...\n"; exit 1 }
+  eof { send_user "\nFailed test...\n"; exit 1 }
+  "Total: 3020796" { send_user "\nTest successful!\n"; exit 0 }
+}
