@@ -23,11 +23,11 @@
 
 (defn solve
   [words-per-length target-length phrase-len used-words counter]
-  (if (= target-length phrase-len)
-    (swap! counter inc)
-    (dotimes [i (- target-length phrase-len)]
-      (doseq [w (get words-per-length (inc i) [])]
-        (if (not (contains? used-words w))
+  (dotimes [i (- target-length phrase-len)]
+    (doseq [w (get words-per-length (inc i) [])]
+      (if (not (contains? used-words w))
+        (if (= target-length (+ i phrase-len 1))
+          (swap! counter inc)
           (solve words-per-length target-length (+ phrase-len (inc i)) (conj used-words w) counter))))))
 
 (defn -main [& args]
