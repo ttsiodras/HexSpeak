@@ -4,7 +4,7 @@ import re
 import sys
 
 
-def solve(words, currentPhrase, used, targetLength, results):
+def solve_recursive(words, currentPhrase, used, targetLength, results):
     currentLen = len(currentPhrase)
     for i in xrange(1, targetLength - currentLen + 1):
         for word in words.get(i, []):
@@ -12,10 +12,57 @@ def solve(words, currentPhrase, used, targetLength, results):
                 continue
             newPhrase = currentPhrase + word
             if i != targetLength - currentLen:
-                solve(words, newPhrase, used + [word], targetLength, results)
+                solve_recursive(words, newPhrase, used + [word], targetLength, results)
             else:
                 # print used, '+', word, '=', newPhrase
                 results.append(newPhrase)
+
+
+def solve_nonrecursive(words, targetLength):
+    from collections import deque
+    candidates = deque([([], 0)])
+    results = []
+    while candidates:
+        wordsSoFar, currentLen = candidates.popleft()
+        if currentLen == targetLength:
+            #print ' '.join(wordsSoFar)
+            results.append(''.join(wordsSoFar))
+        else:
+            for i in xrange(1, targetLength - currentLen + 1):
+                for word in words.get(i, []):
+                    if word not in wordsSoFar:
+                        candidates.append((wordsSoFar + [word], currentLen+i))
+    return results
+
+
+def solve_recursive_count(words, currentLen, used, targetLength, results):
+    for i in xrange(1, targetLength - currentLen + 1):
+        for word in words.get(i, []):
+            if word in used:
+                continue
+            if i != targetLength - currentLen:
+                solve_recursive_count(words, currentLen + i, used + [word], targetLength, results)
+            else:
+                results[0] += 1
+
+
+def solve_nonrecursive_count(words, targetLength):
+    from collections import deque
+    candidates = deque([([], 0)])
+    results = 0
+    maxQ = 0
+    while candidates:
+        maxQ = max(maxQ, len(candidates))
+        wordsSoFar, currentLen = candidates.popleft()
+        if currentLen == targetLength:
+            results += 1
+        else:
+            for i in xrange(1, targetLength - currentLen + 1):
+                for word in words.get(i, []):
+                    if word not in wordsSoFar:
+                        candidates.append((wordsSoFar + [word], currentLen+i))
+    print maxQ
+    return results
 
 
 def main():
@@ -35,9 +82,13 @@ def main():
             if word not in words.get(len(word), []):
                 words.setdefault(len(word), []).append(word)
     words[1] = ['a']
-    results = []
-    solve(words, '', [], targetLength, results)
-    print "Total:", len(results)
+    if False:
+        results = solve_nonrecursive_count(words, targetLength)
+        print "Total:", results
+    else:
+        results = [0]
+        solve_recursive_count(words, 0, [], targetLength, results)
+        print "Total:", results[0]
     import resource
     print resource.getrusage(resource.RUSAGE_SELF).ru_maxrss, "KB"
 
