@@ -4,8 +4,8 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.7.0"]]
-  :aot [thanassis.core]
-  ; :main ^:skip-aot thanassis.core
-  :main thanassis.core
+  :aot [thanassis.hexspeak]
+  ; :main ^:skip-aot thanassis.hexspeak
+  :main thanassis.hexspeak
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}})

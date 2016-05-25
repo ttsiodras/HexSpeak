@@ -2,7 +2,7 @@ TARGET=target/uberjar/thanassis-0.1.0-SNAPSHOT-standalone.jar
 
 all:	${TARGET}
 
-${TARGET}:	src/thanassis/core.clj
+${TARGET}:	src/thanassis/hexspeak.clj
 	@lein uberjar
 
 bench:	benchPython benchJava benchPyPy
@@ -27,6 +27,6 @@ test:	| ${TARGET}
 	@./contrib/verifyResultFor14.expect
 
 clean:
-	rm -f ${TARGET}
+	rm -rf ${TARGET} target
 
 .PHONY:	bench clean test bench benchPython benchPyPy benchJava
