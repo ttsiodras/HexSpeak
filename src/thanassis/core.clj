@@ -1,4 +1,4 @@
-(ns thanassis.core
+(ns thanassis.hexspeak
   (:gen-class))
 
 (set! *warn-on-reflection* true)
@@ -41,6 +41,5 @@
       (do
         (reset! counter 0)
         (time (solve words-per-length phrase-length 0 #{} counter))
-        ;(doall (map #(printf "%s\n" %) res))
         (printf "Total: %d\n" @counter)))
         (flush)))
