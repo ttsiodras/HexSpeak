@@ -4,15 +4,29 @@
 (set! *warn-on-reflection* true)
 
 (defn good-words [rdr letters]
+  "Reads words from a with-open-ed stream and filters them
+  to only include the ones that contain the letters passed.
+  It also drops words of length 1 and 2, and drops
+  3 'words' of length 3 that exist in /usr/share/dict/words"
+
   (let [matcher (re-pattern (str "^[" letters "]*$"))
         forbidden #{"aaa" "aba" "abc"}]
     (doall (->> (line-seq rdr)
                 (filter #(and (> (.length ^String %) 2)
                               (re-matches matcher %)
-                              (not (contains? forbidden %))
-                              ))))))
+                              (not (contains? forbidden %))))))))
 
 (defn get-words-per-length [dictionary-file letters]
+  "It's much faster to access vectors of words of the same length,
+  so this uses good-words to generate the list of valid words,
+  and then arranges them into a neat vector:
+
+  [['a'] [] ['bee', 'fed', ...] ['dead', ...]]
+
+  Valid words of length 1 are first, then valid words of length 2 (none),
+  length 3, 4, etc...
+  Accessing this is faster than using the hashmap returned by group-by (below)"
+
   (let [candidates (with-open [rdr (clojure.java.io/reader dictionary-file)]
                      (good-words rdr letters))
         in-map-form (group-by #(.length ^String %)
@@ -21,6 +35,10 @@
     (into [] (map #(get in-map-form % []) (range max-length)))))
 
 (defn solve
+  "Using the list of valid options from our list of words,
+  recurse to form complete phrases of the desired target-length,
+  and count them all up to see how many there are."
+
   [words-per-length target-length phrase-len used-words counter]
   (dotimes [i (- target-length phrase-len)]
     (doseq [w (get words-per-length (inc i) [])]
@@ -32,9 +50,9 @@
 (defn -main [& args]
   "Expects as cmd-line arguments:
 
-      Desired length of phrases (e.g. 8)
-      Letters to search for     (e.g. abcdef)
-      Dictionary file to use    (e.g. /usr/share/dict/words)
+  - Desired length of phrases (e.g. 8)
+  - Letters to search for     (e.g. abcdef)
+  - Dictionary file to use    (e.g. /usr/share/dict/words)
 
   Prints the number of such HexSpeak phrases (e.g. 0xADEADBEE (a dead bee) is one"
 
