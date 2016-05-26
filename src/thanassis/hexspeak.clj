@@ -17,15 +17,16 @@
                               (not (contains? forbidden %))))))))
 
 (defn get-words-per-length [dictionary-file letters]
-  "It's much faster to access vectors of words of the same length,
-  so this uses good-words to generate the list of valid words,
-  and then arranges them into a neat vector:
+  "The algorithm below (in solve) needs to access words of the same
+  length, and a vector is much faster than a hashmap (which is what
+  is returned by group-by below). This function uses good-words
+  to generate the list of valid words, and then arranges them into
+  a neat vector:
 
   [['a'] [] ['bee', 'fed', ...] ['dead', ...]]
 
   Valid words of length 1 are first, then valid words of length 2 (none),
-  length 3, 4, etc...
-  Accessing this is faster than using the hashmap returned by group-by (below)"
+  length 3, 4, etc..."
 
   (let [candidates (with-open [rdr (clojure.java.io/reader dictionary-file)]
                      (good-words rdr letters))
@@ -44,8 +45,9 @@
     (doseq [w (get words-per-length (inc i) [])]
       (if (not (contains? used-words w))
         (if (= target-length (+ i phrase-len 1))
-          (vswap! counter inc)
-          (solve words-per-length target-length (+ phrase-len (inc i)) (conj used-words w) counter))))))
+          (vswap! counter inc) ;faster than swap! and atom
+          (solve words-per-length target-length (+ phrase-len (inc i))
+                 (conj used-words w) counter))))))
 
 (defn -main [& args]
   "Expects as cmd-line arguments:
@@ -54,12 +56,13 @@
   - Letters to search for     (e.g. abcdef)
   - Dictionary file to use    (e.g. /usr/share/dict/words)
 
-  Prints the number of such HexSpeak phrases (e.g. 0xADEADBEE (a dead bee) is one"
+  Prints the number of such HexSpeak phrases
+  (e.g. 0xADEADBEE - a dead bee - is one of them)"
 
   (let [phrase-length (Integer. ^String (re-find #"\d+" (nth args 0 4)))
         letters (nth args 1 "abcdef")
         dictionary-file (nth args 2 "/usr/share/dict/words")
-        counter (volatile! 0)
+        counter (volatile! 0) ; faster than atom
         words-per-length (get-words-per-length dictionary-file letters)]
     (dotimes [n 10]
       (do
