@@ -75,7 +75,7 @@ def main():
     else:
         targetLength = int(sys.argv[1])
         letters = sys.argv[2].replace('0', 'o').replace('1', 'il')
-        dictionaryFile = '/usr/share/dict/words'
+        dictionaryFile = sys.argv[3]
     m = re.compile(r'^[' + letters + ']*$')
     for word in open(dictionaryFile):
         word = word.strip()

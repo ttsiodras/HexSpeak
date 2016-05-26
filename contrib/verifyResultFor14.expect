@@ -9,7 +9,7 @@ expect {
 }
 
 send_user "\nVerifying CPython result...\n"
-spawn python2 ./contrib/hexspeak.py abcdef 14 contrib/words
+spawn python2 ./contrib/hexspeak.py 14 abcdef contrib/words
 expect {
   timeout { send_user "\nFailed test...\n"; exit 1 }
   eof { send_user "\nFailed test...\n"; exit 1 }
@@ -17,7 +17,7 @@ expect {
 }
 
 send_user "\nVerifying PyPy result...\n"
-spawn python2 ./contrib/hexspeak.py abcdef 14 contrib/words
+spawn python2 ./contrib/hexspeak.py 14 abcdef contrib/words
 expect {
   timeout { send_user "\nFailed test...\n"; exit 1 }
   eof { send_user "\nFailed test...\n"; exit 1 }
