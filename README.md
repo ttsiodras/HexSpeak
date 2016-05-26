@@ -114,9 +114,6 @@ I added a `bench` rule in my Makefile, that measures 10 runs in CPython and Pypy
 
 Times in the JVM are in milliseconds - in the other two, it's just seconds.
 
-*(Note: the benchmarking depends on my [stats.py](https://github.com/ttsiodras/utils/blob/master/stats.py)
-being in the PATH)*.
-
 So, Python first...
 
     $ make bench
