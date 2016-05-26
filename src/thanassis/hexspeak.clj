@@ -8,8 +8,8 @@
         forbidden #{"aaa" "aba" "abc"}]
     (doall (->> (line-seq rdr)
                 (filter #(and (> (.length ^String %) 2)
-                              (not (contains? forbidden %))
                               (re-matches matcher %)
+                              (not (contains? forbidden %))
                               ))))))
 
 (defn get-words-per-length [letters]
