@@ -27,7 +27,7 @@
     (doseq [w (get words-per-length (inc i) [])]
       (if (not (contains? used-words w))
         (if (= target-length (+ i phrase-len 1))
-          (swap! counter inc)
+          (vswap! counter inc)
           (solve words-per-length target-length (+ phrase-len (inc i)) (conj used-words w) counter))))))
 
 (defn -main [& args]
@@ -35,11 +35,11 @@
         f2 (second args)
         phrase-length (if (nil? f1) 4 (Integer. ^String (re-find #"\d+" f1)))
         letters (if (nil? f2) "abcdef" f2)
-        counter (atom 0)
+        counter (volatile! 0)
         words-per-length (get-words-per-length letters)]
     (dotimes [n 10]
       (do
-        (reset! counter 0)
+        (vreset! counter 0)
         (time (solve words-per-length phrase-length 0 #{} counter))
         (printf "Total: %d\n" @counter)))
         (flush)))
