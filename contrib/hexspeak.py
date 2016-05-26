@@ -4,39 +4,6 @@ import re
 import sys
 
 
-def solve_recursive(words, currentPhrase, used, targetLength, results):
-    currentLen = len(currentPhrase)
-    for i in xrange(1, targetLength - currentLen + 1):
-        for word in words.get(i, []):
-            if word in used:
-                continue
-            newPhrase = currentPhrase + word
-            if i != targetLength - currentLen:
-                solve_recursive(
-                    words, newPhrase, used + [word], targetLength, results)
-            else:
-                # print used, '+', word, '=', newPhrase
-                results.append(newPhrase)
-
-
-def solve_nonrecursive(words, targetLength):
-    from collections import deque
-    candidates = deque([([], 0)])
-    results = []
-    while candidates:
-        wordsSoFar, currentLen = candidates.popleft()
-        if currentLen == targetLength:
-            #print ' '.join(wordsSoFar)
-            results.append(''.join(wordsSoFar))
-        else:
-            for i in xrange(1, targetLength - currentLen + 1):
-                for word in words.get(i, []):
-                    if word not in wordsSoFar:
-                        candidates.append(
-                            (wordsSoFar + [word], currentLen + i))
-    return results
-
-
 def solve_recursive_count(words, currentLen, used, targetLength, cnt):
     for i in xrange(1, targetLength - currentLen + 1):
         for word in words.get(i, []):
