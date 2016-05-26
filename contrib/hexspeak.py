@@ -68,14 +68,16 @@ def solve_nonrecursive_count(words, targetLength):
 
 def main():
     words = {}
-    if len(sys.argv) == 1:
-        letters = 'abcdef01'
+    if len(sys.argv) != 4:
         targetLength = 8
+        letters = 'abcdef01'
+        dictionaryFile = '/usr/share/dict/words'
     else:
-        letters = sys.argv[1].replace('0', 'o').replace('1', 'il')
-        targetLength = int(sys.argv[2])
+        targetLength = int(sys.argv[1])
+        letters = sys.argv[2].replace('0', 'o').replace('1', 'il')
+        dictionaryFile = '/usr/share/dict/words'
     m = re.compile(r'^[' + letters + ']*$')
-    for word in open('/usr/share/dict/words'):
+    for word in open(dictionaryFile):
         word = word.strip()
         if len(word) > 2 and m.match(word):
             if word in ['aaa', 'aba', 'abc']:

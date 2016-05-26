@@ -12,9 +12,8 @@
                               (not (contains? forbidden %))
                               ))))))
 
-(defn get-words-per-length [letters]
-  (let [input-file "/usr/share/dict/words"
-        candidates (with-open [rdr (clojure.java.io/reader input-file)]
+(defn get-words-per-length [dictionary-file letters]
+  (let [candidates (with-open [rdr (clojure.java.io/reader dictionary-file)]
                      (good-words rdr letters))
         in-map-form (group-by #(.length ^String %)
                               (concat candidates ["a"]))
@@ -31,12 +30,19 @@
           (solve words-per-length target-length (+ phrase-len (inc i)) (conj used-words w) counter))))))
 
 (defn -main [& args]
-  (let [f1 (first args)
-        f2 (second args)
-        phrase-length (if (nil? f1) 4 (Integer. ^String (re-find #"\d+" f1)))
-        letters (if (nil? f2) "abcdef" f2)
+  "Expects as cmd-line arguments:
+
+      Desired length of phrases (e.g. 8)
+      Letters to search for     (e.g. abcdef)
+      Dictionary file to use    (e.g. /usr/share/dict/words)
+
+  Prints the number of such HexSpeak phrases (e.g. 0xADEADBEE (a dead bee) is one"
+
+  (let [phrase-length (Integer. ^String (re-find #"\d+" (nth args 0 4)))
+        letters (nth args 1 "abcdef")
+        dictionary-file (nth args 2 "/usr/share/dict/words")
         counter (volatile! 0)
-        words-per-length (get-words-per-length letters)]
+        words-per-length (get-words-per-length dictionary-file letters)]
     (dotimes [n 10]
       (do
         (vreset! counter 0)
