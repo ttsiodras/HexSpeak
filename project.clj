@@ -8,4 +8,5 @@
   ; :main ^:skip-aot thanassis.hexspeak
   :main thanassis.hexspeak
   :target-path "target/%s"
+  :jvm-opts ^:replace []
   :profiles {:uberjar {:aot :all}})
