@@ -53,8 +53,11 @@ def main():
                 words.setdefault(len(word), []).append(word)
     words[1] = ['a']
     cnt = [0]
+    import time
+    start = time.time()
     solve_recursive_count(words, 0, [], targetLength, cnt)
-    print "Total:", cnt[0]
+    end = time.time()
+    print cnt[0], "in", 1000*(end-start), "ms"
     #
     # Not using recursion is much slower! Apparently cache is thrashed
     #
