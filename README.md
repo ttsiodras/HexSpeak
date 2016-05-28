@@ -140,9 +140,9 @@ slower than plain Java. PyPy's performance surprised me, to be honest.
 
 ## Test me, Luke
 
-All 3 report the same number of 14-length HexSpeak phrases (3020796).
-I added an expect script to avoid regressions while I was testing changes
-in the code:
+All 4 implementations report the same number of 14-length HexSpeak phrases
+(that is, 3020796). To avoid regressions while I was testing code changes
+I added an expect script that verified it:
 
     $ make test
 
