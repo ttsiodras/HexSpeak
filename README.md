@@ -108,110 +108,64 @@ Both of the implementations are equally succinct.
 
 ## Step 3: Speed!
 
-I added a `bench` rule in my Makefile, that measures 10 runs in CPython and Pypy
-(via bash's `time`) and 10 executions in one run inside the JVM (via Clojure's
-`time`, to avoid the JVM's startup cost and also warm-up the HotSpot technology).
+I added a `bench` rule in my Makefile, that measures 10 runs of `solve`
+for 14-character long HexSpeak phrases. I used `time.time()` in Python,
+and Clojure's `time` - to avoid the JVM's startup cost and also warm-up
+the HotSpot technology (the first couple of runs are much slower than
+the rest). 
 
-Times in the JVM are in milliseconds - in the other two, it's just seconds.
+**UPDATE, two days later**: I also added a Java implementation to the mix.
 
-So, Python first...
+Results in my laptop:
 
     $ make bench
-
-    Benchmarking Python...
-    2.575
-    2.580
-    ...
-    2.559
+    Benchmarking Python (best out of 10 executions)...
+                Min: 2432.77812
     
-    Statistics :
-      Average value: 2.57430
-      Std deviation: 0.01540
-      Sample stddev: 0.01623
-             Median: 2.57450
-                Min: 2.55200
-                Max: 2.60100
-       Overall: 2.5743 +/- 0.6%
-
-In my laptop, Python takes 2.5 seconds to find the number of 14-letter long
-HexSpeak phrases.
-
-What about Clojure's AOT-compiled code running in the JVM?
-
-    Benchmarking JVM...
-    1714.293231
-    1213.169677
-    ...
-    1221.719871
+    Benchmarking Clojure (best out of 10 executions)...
+                Min: 935.23521
     
-    Statistics :
-      Average value: 1325.81633
-      Std deviation: 139.18757
-      Sample stddev: 146.71658
-             Median: 1302.97497
-                Min: 1210.28791
-                Max: 1714.29323
-       Overall: 1325.8163335 +/- 11.1%
-
-Twice as fast! Bravo, JVM!
-
-What about PyPy?
-
-    Benchmarking PyPy...
-    0.456
-    0.454
-    ...
-    0.454
+    Benchmarking PyPy (best out of 10 executions)...
+                Min: 382.45010
     
-    Statistics :
-      Average value: 0.45170
-      Std deviation: 0.00215
-      Sample stddev: 0.00226
-             Median: 0.45100
-                Min: 0.44900
-                Max: 0.45600
-       Overall: 0.4517 +/- 0.5%
+    Benchmarking Java (best out of 10 executions)...
+                Min: 103.00000
 
-Yikes - 3x faster than the Clojure version.
-
-Note that this is the exact same algorithm in all 3 cases - a plain recursion
+Note that this is the exact same algorithm in all cases - a plain recursion
 visiting the *word space* of HexSpeak, in exactly the same order.
-I suspect that PyPy somehow makes better use of my CPU's cache.
+
+These results more or less match my expectations when I started this 
+Clojure experiment... Clojure is much faster than Python, but it's also
+slower than plain Java. PyPy's performance surprised me, to be honest.
 
 ## Test me, Luke
 
-All 3 report the same number of 14-length HexSpeak phrases:
+All 3 report the same number of 14-length HexSpeak phrases (3020796).
+I added an expect script to avoid regressions while I was testing changes
+in the code:
 
     $ make test
-    Testing...
+
+    Verifying Clojure result...
+    Clojure tested successfully!
     
     Verifying Java result...
-    spawn java -jar target/uberjar/thanassis-0.1.0-SNAPSHOT-standalone.jar 14 abcdef
-    "Elapsed time: 1622.970973 msecs"
-    Total: 3020796
-    
     Java tested successfully!
     
     Verifying CPython result...
-    spawn python2 ./contrib/hexspeak.py abcdef 14
-    Total: 3020796
-    
     CPython tested successfully!
     
     Verifying PyPy result...
-    spawn python2 ./contrib/hexspeak.py abcdef 14
-    Total: 3020796
-    
     All tests successful!
 
-## Thoughts
+## Concluding thoughts
 
-Liked playing with Clojure. Ah, the LISPs... once you meet them, you can never forget them.
+I liked playing with Clojure. I have [a soft spot for Lisps](https://www.thanassis.space/score4.html#lisp)
+so it was interesting to play with one again. And even though this benchmark
+reminded me that *there's no such thing as a free lunch* (i.e. Clojure is slower than Java),
+Clojure's immutable way of working shields your code from tons of bugs (e.g. contrast
+[this mutation in Java](https://github.com/ttsiodras/HexSpeak/blob/master/contrib/hexspeak.java#L59)
+with [this immutable addition in Clojure](https://github.com/ttsiodras/HexSpeak/blob/master/src/thanassis/hexspeak.clj#L50).
 
-They keep calling you back... :-)
-
-## License
-
-Surely you're joking, Mr Feynmann.
-
-Fine, have a GNU one (see file COPYING).
+All in all, this was fun - and quite educational. Thanks go to all the people that chimed in
+the discussion at [Reddit/Clojure](https://www.reddit.com/r/Clojure/comments/4l28go/pitting_clojure_against_python_in_hexspeak/).

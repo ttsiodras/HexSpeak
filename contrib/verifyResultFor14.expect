@@ -1,25 +1,34 @@
 #!/usr/bin/env expect
 set timeout 20
-send_user "\nVerifying Java result...\n"
-spawn java -jar target/uberjar/thanassis-0.1.0-SNAPSHOT-standalone.jar 14 abcdef contrib/words
+
+send_user "\nVerifying Clojure result...\n"
+spawn -noecho java -jar target/uberjar/thanassis-0.1.0-SNAPSHOT-standalone.jar 14 abcdef contrib/words
 expect {
   timeout { send_user "\nFailed test...\n"; exit 1 }
   eof { send_user "\nFailed test...\n"; exit 1 }
-  "Total: 3020796" { send_user "\nJava tested successfully!\n" }
+  "Total: 3020796" { send_user "\nClojure tested successfully!\n" }
+}
+
+send_user "\nVerifying Java result...\n"
+spawn -noecho bash -c "cd contrib ; java hexspeak"
+expect {
+  timeout { send_user "\nFailed test...\n"; exit 1 }
+  eof { send_user "\nFailed test...\n"; exit 1 }
+  "3020796" { send_user "\n\nJava tested successfully!\n" }
 }
 
 send_user "\nVerifying CPython result...\n"
-spawn python2 ./contrib/hexspeak.py 14 abcdef contrib/words
+spawn -noecho python2 ./contrib/hexspeak.py 14 abcdef contrib/words
 expect {
   timeout { send_user "\nFailed test...\n"; exit 1 }
   eof { send_user "\nFailed test...\n"; exit 1 }
-  "Total: 3020796" { send_user "\nCPython tested successfully!\n" }
+  "3020796" { send_user "\nCPython tested successfully!\n" }
 }
 
 send_user "\nVerifying PyPy result...\n"
-spawn python2 ./contrib/hexspeak.py 14 abcdef contrib/words
+spawn -noecho python2 ./contrib/hexspeak.py 14 abcdef contrib/words
 expect {
   timeout { send_user "\nFailed test...\n"; exit 1 }
   eof { send_user "\nFailed test...\n"; exit 1 }
-  "Total: 3020796" { send_user "\nAll tests successful!\n"; exit 0 }
+  "3020796" { send_user "\nAll tests successful!\n"; exit 0 }
 }

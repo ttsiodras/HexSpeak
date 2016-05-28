@@ -1,5 +1,9 @@
 TARGET=target/uberjar/thanassis-0.1.0-SNAPSHOT-standalone.jar
 
+ifndef VERBOSE
+    .SILENT:
+endif
+
 EXPECT:=$(shell command -v expect 2>/dev/null)
 GREP:=$(shell command -v grep 2>/dev/null)
 AWK:=$(shell command -v awk 2>/dev/null)
@@ -75,7 +79,7 @@ ifndef EXPECT
 	$(error "The 'expect' utility appears to be missing...")
 endif
 	@echo Testing...
-	@./contrib/verifyResultFor14.expect
+	@./contrib/verifyResultFor14.expect | grep -v --line-buffered Elapsed | grep -v --line-buffered 3020796
 
 clean:
 	rm -rf ${TARGET} target contrib/hexspeak.class
