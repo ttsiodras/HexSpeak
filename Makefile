@@ -5,6 +5,8 @@ GREP:=$(shell command -v grep 2>/dev/null)
 AWK:=$(shell command -v awk 2>/dev/null)
 BASH:=$(shell command -v bash 2>/dev/null)
 LEIN:=$(shell command -v lein 2>/dev/null)
+JAVA:=$(shell command -v java 2>/dev/null)
+JAVAC:=$(shell command -v javac 2>/dev/null)
 
 all:	${TARGET}
 
@@ -27,6 +29,9 @@ endif
 	@echo "All tools are there, proceeding..."
 
 contrib/hexspeak.class:	contrib/hexspeak.java
+ifndef JAVAC
+	$(error "You appear to be missing the 'javac' from the JDK...")
+endif
 	cd contrib ; javac hexspeak.java
 
 bench:	| ${TARGET} checkBenchDeps contrib/hexspeak.class
@@ -48,15 +53,22 @@ benchPyPy:
 	@echo
 
 benchClojure:	| ${TARGET}
+ifndef JAVA
+	$(error "You appear to be missing the 'java' JRE...")
+endif
 	@echo
 	@echo "Benchmarking Clojure (best out of 10 executions)..."
 	@java -jar ${TARGET} 14 abcdef contrib/words | grep --line-buffered Elapsed | awk '{print $$3; fflush();}' | contrib/stats.py | grep Min
 	@echo
 
 benchJava:
+ifndef JAVA
+	$(error "You appear to be missing the 'java' JRE...")
+endif
 	@echo
 	@echo "Benchmarking Java (best out of 10 executions)..."
 	@cd contrib ; java hexspeak | awk '{print $$3; fflush();}' | ./stats.py | grep Min
+	@echo
 
 test:	| ${TARGET}
 ifndef EXPECT

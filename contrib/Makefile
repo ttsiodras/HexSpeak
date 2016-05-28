@@ -1,2 +1,0 @@
-all:
-	javac hexspeak.java
