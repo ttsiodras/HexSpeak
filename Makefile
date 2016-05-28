@@ -2,8 +2,7 @@ TARGET=target/uberjar/thanassis-0.1.0-SNAPSHOT-standalone.jar
 
 EXPECT:=$(shell command -v expect 2>/dev/null)
 GREP:=$(shell command -v grep 2>/dev/null)
-SED:=$(shell command -v sed 2>/dev/null)
-TEE:=$(shell command -v tee 2>/dev/null)
+AWK:=$(shell command -v awk 2>/dev/null)
 BASH:=$(shell command -v bash 2>/dev/null)
 LEIN:=$(shell command -v lein 2>/dev/null)
 
@@ -19,36 +18,45 @@ checkBenchDeps:
 ifndef GREP
 	$(error "You appear to be missing the 'grep' utility...")
 endif
-ifndef SED
-	$(error "You appear to be missing the 'sed' utility...")
-endif
-ifndef TEE
-	$(error "You appear to be missing the 'tee' utility...")
+ifndef AWK
+	$(error "You appear to be missing the 'awk' utility...")
 endif
 ifndef BASH
 	$(error "You appear to be missing the 'bash' shell...")
 endif
 	@echo "All tools are there, proceeding..."
 
-bench:	| ${TARGET} checkBenchDeps
+contrib/hexspeak.class:	contrib/hexspeak.java
+	cd contrib ; javac hexspeak.java
+
+bench:	| ${TARGET} checkBenchDeps contrib/hexspeak.class
 	$(MAKE) benchPython
-	$(MAKE) benchJava
+	$(MAKE) benchClojure
 	$(MAKE) benchPyPy
+	$(MAKE) benchJava
 
 benchPython:
-	@echo Benchmarking Python...
-	@bash -c "for i in {1..10} ; do bash -c 'time ./contrib/hexspeak.py 14 abcdef contrib/words' |& grep --line-buffered ^real | sed 's,s$$,,;s,^.*m,,' ; done" | tee /dev/stderr | contrib/stats.py
+	@echo
+	@echo "Benchmarking Python (best out of 10 executions)..."
+	@bash -c "for i in {1..10} ; do ./contrib/hexspeak.py 14 abcdef contrib/words ; done" | awk '{print $$3; fflush();}' | contrib/stats.py | grep Min
 	@echo
 
 benchPyPy:
-	@echo Benchmarking PyPy...
-	@bash -c "for i in {1..10} ; do bash -c 'time pypy ./contrib/hexspeak.py 14 abcdef contrib/words' |& grep --line-buffered ^real | sed 's,s$$,,;s,^.*m,,' ; done" | tee /dev/stderr | contrib/stats.py
+	@echo
+	@echo "Benchmarking PyPy (best out of 10 executions)..."
+	@bash -c "for i in {1..10} ; do pypy ./contrib/hexspeak.py 14 abcdef contrib/words ; done" | awk '{print $$3; fflush();}' | contrib/stats.py | grep Min
 	@echo
 
-benchJava:	| ${TARGET}
-	@echo Benchmarking Java...
-	@bash -c "java -jar ${TARGET} 14 abcdef contrib/words | grep --line-buffered Elapsed | awk '{print \$$3; fflush();}' | tee /dev/stderr | contrib/stats.py"
+benchClojure:	| ${TARGET}
 	@echo
+	@echo "Benchmarking Clojure (best out of 10 executions)..."
+	@java -jar ${TARGET} 14 abcdef contrib/words | grep --line-buffered Elapsed | awk '{print $$3; fflush();}' | contrib/stats.py | grep Min
+	@echo
+
+benchJava:
+	@echo
+	@echo "Benchmarking Java (best out of 10 executions)..."
+	@cd contrib ; java hexspeak | awk '{print $$3; fflush();}' | ./stats.py | grep Min
 
 test:	| ${TARGET}
 ifndef EXPECT
@@ -58,6 +66,6 @@ endif
 	@./contrib/verifyResultFor14.expect
 
 clean:
-	rm -rf ${TARGET} target
+	rm -rf ${TARGET} target contrib/hexspeak.class
 
-.PHONY:	bench clean test bench benchPython benchPyPy benchJava
+.PHONY:	bench clean test bench benchPython benchPyPy benchClojure benchJava
