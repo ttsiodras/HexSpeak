@@ -1,9 +1,9 @@
 # Introduction - HexSpeak in Clojure and Python
 
 **(Executive summary: An experiment I did while playing with Clojure...
-Results: compared to CPython, the same algorithm runs 2x faster
+Results: compared to CPython, the same algorithm runs 2.5x faster
 when written in Clojure and executed in a warmed-up JVM ...but
-PyPy takes the gold medal: it runs it 3x faster!)**
+PyPy takes the gold medal: it runs it 6x faster!)**
 
 ## What is HexSpeak?
 
