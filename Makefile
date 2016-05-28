@@ -65,7 +65,7 @@ endif
 	@java -jar ${TARGET} 14 abcdef contrib/words | grep --line-buffered Elapsed | awk '{print $$3; fflush();}' | contrib/stats.py | grep Min
 	@echo
 
-benchJava:
+benchJava:	contrib/hexspeak.class
 ifndef JAVA
 	$(error "You appear to be missing the 'java' JRE...")
 endif
