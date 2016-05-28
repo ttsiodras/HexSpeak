@@ -167,5 +167,5 @@ Clojure's immutable way of working shields your code from tons of bugs (e.g. con
 [this mutation in Java](https://github.com/ttsiodras/HexSpeak/blob/master/contrib/hexspeak.java#L59)
 with [this immutable addition in Clojure](https://github.com/ttsiodras/HexSpeak/blob/master/src/thanassis/hexspeak.clj#L50).
 
-All in all, this was fun - and quite educational. Thanks go to all the people that chimed in
-the discussion at [Reddit/Clojure](https://www.reddit.com/r/Clojure/comments/4l28go/pitting_clojure_against_python_in_hexspeak/).
+All in all, this was fun - and quite educational. Many thanks to the people
+that provided feedback in [the discussion at Reddit/Clojure](https://www.reddit.com/r/Clojure/comments/4l28go/pitting_clojure_against_python_in_hexspeak/).
