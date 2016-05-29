@@ -1,0 +1,15 @@
+So many people on the web say that benchmarking by just warming up 
+and timing is not enough - well, I tried using Criterium for my 
+Clojure code and came up with pretty much the same measurements
+(I run 10 times to warm up 'solve' and take the best measurement
+to account for HotSpotting). 
+
+I did the same here for Java - using Apache JMH - and reached the
+same conclusion. These frameworks may be necessary for micro-benchmarking;
+but for timing a function that takes 100s of ms, I no longer think
+they are necessary - not after the experiments I did,
+
+Anyway, here's how to measure with JMH:
+
+    $ cd benchmarks
+    $ ./run.sh
