@@ -1,2 +1,3 @@
 contrib/*py linguist-vendored
 contrib/*java linguist-vendored
+contrib/HexSpeak-bench.java.with.JMH/benchmarks/src/main/java/com/mycompany/*java linguist-vendored
