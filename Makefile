@@ -103,5 +103,6 @@ endif
 
 clean:
 	rm -rf ${TARGET} target contrib/hexspeak.class
+	$(MAKE) -C contrib/HexSpeak-C++/ CFG=release clean
 
 .PHONY:	bench clean test bench benchPython benchPyPy benchClojure benchJava
