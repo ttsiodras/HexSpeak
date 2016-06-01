@@ -20,6 +20,7 @@ ifndef LEIN
 endif
 	@lein uberjar
 
+
 checkBenchDeps:
 ifndef GREP
 	$(error "You appear to be missing the 'grep' utility...")
@@ -32,17 +33,21 @@ ifndef BASH
 endif
 	@echo "All tools are there, proceeding..."
 
+
 contrib/hexspeak.class:	contrib/hexspeak.java
 ifndef JAVAC
 	$(error "You appear to be missing the 'javac' from the JDK...")
 endif
 	cd contrib ; javac hexspeak.java
 
+
 bench:	| ${TARGET} checkBenchDeps contrib/hexspeak.class
 	$(MAKE) benchPython
 	$(MAKE) benchClojure
 	$(MAKE) benchPyPy
 	$(MAKE) benchJava
+	$(MAKE) benchCPP
+
 
 benchPython:
 	@echo
@@ -50,11 +55,13 @@ benchPython:
 	@bash -c "for i in {1..10} ; do ./contrib/hexspeak.py 14 abcdef contrib/words ; done" | awk '{print $$3; fflush();}' | contrib/stats.py | grep Min
 	@echo
 
+
 benchPyPy:
 	@echo
 	@echo "Benchmarking PyPy (best out of 10 executions)..."
 	@bash -c "for i in {1..10} ; do pypy ./contrib/hexspeak.py 14 abcdef contrib/words ; done" | awk '{print $$3; fflush();}' | contrib/stats.py | grep Min
 	@echo
+
 
 benchClojure:	| ${TARGET}
 ifndef JAVA
@@ -65,6 +72,7 @@ endif
 	@java -jar ${TARGET} 14 abcdef contrib/words | grep --line-buffered Elapsed | awk '{print $$3; fflush();}' | contrib/stats.py | grep Min
 	@echo
 
+
 benchJava:	contrib/hexspeak.class
 ifndef JAVA
 	$(error "You appear to be missing the 'java' JRE...")
@@ -74,12 +82,24 @@ endif
 	@cd contrib ; java hexspeak | awk '{print $$3; fflush();}' | ./stats.py | grep Min
 	@echo
 
+
+contrib/HexSpeak-C++/bin.release/hexspeak:	contrib/HexSpeak-C++/src/hexspeak.cpp
+	$(MAKE) -C contrib/HexSpeak-C++/ CFG=release
+
+benchCPP:	contrib/HexSpeak-C++/bin.release/hexspeak
+	@echo
+	@echo "Benchmarking C++ (best out of 10 executions)..."
+	@cd contrib/HexSpeak-C++/bin.release/ ; ./hexspeak | awk '{print $$3; fflush();}' | ../../stats.py | grep Min
+	@echo
+	
+
 test:	| ${TARGET}
 ifndef EXPECT
 	$(error "The 'expect' utility appears to be missing...")
 endif
 	@echo Testing...
 	@./contrib/verifyResultFor14.expect | grep -v --line-buffered Elapsed | grep -v --line-buffered 3020796
+
 
 clean:
 	rm -rf ${TARGET} target contrib/hexspeak.class
