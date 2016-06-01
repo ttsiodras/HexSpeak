@@ -93,7 +93,7 @@ benchCPP:	contrib/HexSpeak-C++/bin.release/hexspeak
 	@echo
 	
 
-test:	| ${TARGET}
+test:	| ${TARGET} contrib/HexSpeak-C++/bin.release/hexspeak
 ifndef EXPECT
 	$(error "The 'expect' utility appears to be missing...")
 endif

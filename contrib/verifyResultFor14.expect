@@ -25,10 +25,18 @@ expect {
   "3020796" { send_user "\nCPython tested successfully!\n" }
 }
 
+send_user "\nVerifying C++ result...\n"
+spawn -noecho ./contrib/HexSpeak-C++/bin.release/hexspeak 14 abcdef contrib/words
+expect {
+  timeout { send_user "\nFailed test...\n"; exit 1 }
+  eof { send_user "\nFailed test...\n"; exit 1 }
+  "3020796" { send_user "\nC++ tested successfully!\n" }
+}
+
 send_user "\nVerifying PyPy result...\n"
 spawn -noecho python2 ./contrib/hexspeak.py 14 abcdef contrib/words
 expect {
   timeout { send_user "\nFailed test...\n"; exit 1 }
   eof { send_user "\nFailed test...\n"; exit 1 }
-  "3020796" { send_user "\nAll tests successful!\n"; exit 0 }
+  "3020796" { send_user "\nAll tests were successful!\n"; exit 0 }
 }
