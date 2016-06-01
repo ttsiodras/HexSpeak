@@ -14,6 +14,7 @@ JAVAC:=$(shell command -v javac 2>/dev/null)
 
 all:	${TARGET}
 
+
 ${TARGET}:	src/thanassis/hexspeak.clj
 ifndef LEIN
 	$(error "You appear to be missing the 'lein' builder (Leiningen)")
@@ -41,7 +42,7 @@ endif
 	cd contrib ; javac hexspeak.java
 
 
-bench:	| ${TARGET} checkBenchDeps contrib/hexspeak.class
+bench:	| ${TARGET} checkBenchDeps contrib/hexspeak.class contrib/HexSpeak-C++/bin.release/hexspeak
 	$(MAKE) benchPython
 	$(MAKE) benchClojure
 	$(MAKE) benchPyPy
