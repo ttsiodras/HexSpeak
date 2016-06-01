@@ -115,6 +115,7 @@ the HotSpot technology (the first couple of runs are much slower than
 the rest). 
 
 **UPDATE, two days later**: I also added a Java implementation to the mix.
+**UPDATE, four days later**: I also added a C++ implementation to the mix.
 
 Results in my laptop:
 
@@ -131,12 +132,17 @@ Results in my laptop:
     Benchmarking Java (best out of 10 executions)...
                 Min: 103.00000
 
+    Benchmarking C++ (best out of 10 executions)...
+                Min: 34.28970
+
 Note that this is the exact same algorithm in all cases - a plain recursion
 visiting the *word space* of HexSpeak, in exactly the same order.
 
 These results more or less match my expectations when I started this 
 Clojure experiment... Clojure is much faster than Python, but it's also
 slower than plain Java. PyPy's performance surprised me, to be honest.
+And of course, C++ speed is on a class of its own - but the code is
+a mutable mayhem :-)
 
 ## Test me, Luke
 
