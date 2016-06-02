@@ -2,3 +2,5 @@ contrib/*py linguist-vendored
 contrib/*java linguist-vendored
 contrib/HexSpeak-bench.java.with.JMH/benchmarks/src/main/java/com/mycompany/*java linguist-vendored
 contrib/HexSpeak-C++/src/hexspeak.cpp linguist-vendored
+contrib/HexSpeak-C++/Makefile linguist-vendored
+Makefile linguist-vendored
