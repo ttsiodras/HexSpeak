@@ -93,7 +93,7 @@ benchmark just counts them: )*
     solve_recursive_count(words, 0, [], targetLength, cnt)
     print "Total:", cnt[0]
 
-Clojure: *(using a `volatile!` (faster than `atom`) for the counter)*
+Clojure: *(using a `volatile!` - faster than `atom` - for the counter)*
 
     (defn solve
       [words-per-length target-length phrase-len used-words counter]
@@ -131,7 +131,7 @@ and since I could play with the actual string data there, I switched
 `used` to using them instead of strings... In CS parlance, I *interned*
 the strings - which made C++ 3 times faster than Java.
 
-Of course it was also the only language where I had segfaults as I was coding ;
+Of course it was also the only language where I had segfaults as I was coding
 *(easy, correct, fast - pick two)* :-)
 
 Results in my laptop:
