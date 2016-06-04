@@ -74,10 +74,10 @@ OK, we have the candidates... time to assemble them recursively!
 
 ## Step 2: Assemble the candidates
 
-Python: (* to avoid using a global counter, I just mutate the first 
+Python: *(to avoid using a global counter, I just mutate the first 
 element of a list. In the initial version of the code, I was adding the phrases
 to this list so the caller of `solve` could print them - but this 
-benchmark just counts them: *)
+benchmark just counts them: )*
 
     def solve_recursive_count(words, currentLen, used, targetLength, cnt):
         for i in xrange(1, targetLength - currentLen + 1):
