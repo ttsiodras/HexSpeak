@@ -166,6 +166,7 @@ endif
 	@echo
 	@printf "$(GREEN)Benchmarking Clojure (best out of 10 executions)...$(NO_COLOR)"
 	@java -jar ${TARGET_CLOJURE} 14 abcdef contrib/words | grep --line-buffered Elapsed | awk '{print $$3; fflush();}' | contrib/stats.py | grep Min
+	@echo
 
 
 benchJava:	${TARGET_JAVA}
