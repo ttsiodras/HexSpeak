@@ -1,0 +1,10 @@
+#!/usr/bin/env expect
+set timeout 20
+
+send_user "\nVerifying Clojure result...\n"
+spawn -noecho java -jar target/uberjar/thanassis-0.1.0-SNAPSHOT-standalone.jar 14 abcdef contrib/words
+expect {
+  timeout { send_user "\n\033\[31mFailed test...\033\[0m\n"; exit 1 }
+  eof { send_user "\n\033\[31mFailed test...\033\[0m\n"; exit 1 }
+  "Total: 3020796" { send_user "\n\033\[32mClojure tested successfully!\033\[0m\n" }
+}
