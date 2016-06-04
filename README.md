@@ -14,7 +14,10 @@ PyPy takes the gold medal: it runs it 6x faster!)**
 ...etc. Phrases like these pop up as magic constants in various 
 places - markers in memory, in custom buses, etc.
 
-But... how can we figure out all possible hexspeak phrases?
+But... how can we figure out all possible hexspeak phrases of a
+target length and count them?
+
+[![alt](https://asciinema.org/a/9trefb2q1f3zzpyfnj3u6bpkc.png)](https://asciinema.org/a/9trefb2q1f3zzpyfnj3u6bpkc)
 
 ## Step 1 - collect the candidate words
 
@@ -144,25 +147,19 @@ slower than plain Java. PyPy's performance surprised me, to be honest.
 And of course, C++ speed is on a class of its own - but the code is
 a mutable mayhem :-)
 
-## Test me, Luke
+## JMH and Criterium
 
-All 4 implementations report the same number of 14-length HexSpeak phrases
-(that is, 3020796). To avoid regressions while I was testing code changes
-I added an expect script that verified it:
+Benchmarking under the JVM can be perilous - the established wisdom
+is that for Java you use
+[https://github.com/ttsiodras/HexSpeak/tree/master/contrib/HexSpeak-bench.java.with.JMH/benchmarks](JMH)
+and for Clojure you use 
+[https://github.com/ttsiodras/HexSpeak/blob/criterium/src/thanassis/hexspeak.clj#L82](Criterium).
 
-    $ make test
-
-    Verifying Clojure result...
-    Clojure tested successfully!
-    
-    Verifying Java result...
-    Java tested successfully!
-    
-    Verifying CPython result...
-    CPython tested successfully!
-    
-    Verifying PyPy result...
-    All tests successful!
+As you can see in the links above, I tried both of them. For micro-benchmarks
+these tools may indeed provide different results - but in my case, there was no 
+discernible difference in the results. Note that I am running the algorithm
+10 times and taking the minimal time ; and both tools provided very similar results
+to my naive measurements with Clojure's `time` and Java's `System.nanotime`.
 
 ## Concluding thoughts
 
