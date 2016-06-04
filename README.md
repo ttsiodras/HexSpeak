@@ -21,9 +21,9 @@ target length and count them?
 
 ## Step 1 - collect the candidate words
 
-Well, filter /usr/share/dict/words with a regexp first,
-to find the candidate `good-words`, then place them
-in a vector:
+We filter `/usr/share/dict/words` with a regexp first,
+to find the candidate `good-words` - and then arrange them
+so we can quickly get to those of a specific length:
 
 Python:
 
@@ -39,7 +39,8 @@ Python:
                 words.setdefault(len(word), []).append(word)
     words[1] = ['a']
 
-Clojure:
+Clojure: (*refactored logic in two functions - one filters
+the words, another groups them via `group-by` based on length: *)
 
     (defn good-words [rdr letters]
       (let [matcher (re-pattern (str "^[" letters "]*$"))
@@ -66,14 +67,17 @@ Testing the Clojure code - showing 3- and 4-letter candidate words:
          "def" "ebb" "eff" "fab" "fad" "fed" "fee"]
 
     (get (get-words-per-length "abcdef") 4)
-    ["abbe" "abed" "aced" "babe" "bade" "bead" "beef" "cafe" "caff" "ceca"
+    ==> ["abbe" "abed" "aced" "babe" "bade" "bead" "beef" "cafe" "caff" "ceca"
      "cede" "dace" "dded" "dead" "deaf" "deed" "face" "fade" "faff" "feed"]
 
-OK, we have the candidates... time to assemble them!
+OK, we have the candidates... time to assemble them recursively!
 
 ## Step 2: Assemble the candidates
 
-Python:
+Python: (* to avoid using a global counter, I just mutate the first 
+element of a list. In the initial version of the code, I was adding the phrases
+to this list so the caller of `solve` could print them - but this 
+benchmark just counts them: *)
 
     def solve_recursive_count(words, currentLen, used, targetLength, cnt):
         for i in xrange(1, targetLength - currentLen + 1):
@@ -84,14 +88,12 @@ Python:
                     solve_recursive_count(
                         words, currentLen + i, used + [word], targetLength, cnt)
                 else:
-                    # print currentPhrase, word
                     cnt[0] += 1
-
     cnt = [0]
     solve_recursive_count(words, 0, [], targetLength, cnt)
     print "Total:", cnt[0]
 
-Clojure:
+Clojure: (* using a `volatile!` (faster than `atom`) for the counter*)
 
     (defn solve
       [words-per-length target-length phrase-len used-words counter]
@@ -99,26 +101,38 @@ Clojure:
         (doseq [w (get words-per-length (inc i) [])]
           (if (not (contains? used-words w))
             (if (= target-length (+ i phrase-len 1))
-              (swap! counter inc)
-              (solve words-per-length target-length (+ phrase-len (inc i)) (conj used-words w) counter))))))
-    (let [counter (atom 0)
+              (vswap! counter inc) ;faster than swap! and atom
+              (solve words-per-length target-length (+ phrase-len (inc i))
+                     (conj used-words w) counter))))))
+    (let [counter (volatile! 0) ; faster than atom
           words-per-length (get-words-per-length "abcdef")]
       (do
         (time (solve words-per-length phrase-length 0 #{} counter))
         (printf "Total: %d\n" @counter)))
 
-Both of the implementations are equally succinct.
+Both of the languages allow for equally succinct implementations.
 
 ## Step 3: Speed!
 
-I added a `bench` rule in my Makefile, that measures 10 runs of `solve`
+I then added a `bench` rule in my Makefile, that measures 10 runs of `solve`
 for 14-character long HexSpeak phrases. I used `time.time()` in Python,
-and Clojure's `time` - to avoid the JVM's startup cost and also warm-up
-the HotSpot technology (the first couple of runs are much slower than
-the rest). 
+and Clojure's `time` to do the measurements - and took the minimum of the
+10 runs to avoid the JVM's startup cost and also take advantage of the warm-up
+of the HotSpot technology (the first couple of `solve` runs are much slower
+than the rest, since the JVM figures out the best places to JIT at run-time). 
 
 **UPDATE, two days later**: I also added a Java implementation to the mix.
-**UPDATE, four days later**: I also added a C++ implementation to the mix.
+Unexpectedly, much faster than Clojure - apparently recursively calling
+a function millions of times is a pattern that is optimized a lot better
+in Java than it is in Clojure.
+
+**UPDATE, four days later**: I also added a C++ implementation to the mix;
+and since I could play with the actual string data there, I switched
+`used` to using them instead of strings... In CS parlance, I *interned*
+the strings - which made C++ 3 times faster than Java.
+
+Of course it was also the only language where I had segfaults as I was coding ;
+*(easy, correct, fast - pick two)* :-)
 
 Results in my laptop:
 
@@ -143,9 +157,9 @@ visiting the *word space* of HexSpeak, in exactly the same order.
 
 These results more or less match my expectations when I started this 
 Clojure experiment... Clojure is much faster than Python, but it's also
-slower than plain Java. PyPy's performance surprised me, to be honest.
-And of course, C++ speed is on a class of its own - but the code is
-a mutable mayhem :-)
+(much!) slower than plain Java. PyPy's performance surprised me (in a
+good way) - and of course, C++ speed is on a class of its own...
+*(with the code being a mutable mayhem of interned pointers to chars)* :-)
 
 ## JMH and Criterium
 
@@ -155,7 +169,7 @@ is that for Java you use
 and for Clojure you use 
 [https://github.com/ttsiodras/HexSpeak/blob/criterium/src/thanassis/hexspeak.clj#L82](Criterium).
 
-As you can see in the links above, I tried both of them. For micro-benchmarks
+As you can see in the links to my code above, I used both of them. For micro-benchmarks
 these tools may indeed provide different results - but in my case, there was no 
 discernible difference in the results. Note that I am running the algorithm
 10 times and taking the minimal time ; and both tools provided very similar results
@@ -164,7 +178,7 @@ to my naive measurements with Clojure's `time` and Java's `System.nanotime`.
 ## Concluding thoughts
 
 I liked playing with Clojure. I have [a soft spot for Lisps](https://www.thanassis.space/score4.html#lisp)
-so it was interesting to play with one again. And even though this benchmark
+so it was interesting to fiddle with one again. And even though this benchmark
 reminded me that *there's no such thing as a free lunch* (i.e. Clojure is slower than Java),
 Clojure's immutable way of working shields your code from tons of bugs (e.g. contrast
 [this mutation in Java](https://github.com/ttsiodras/HexSpeak/blob/master/contrib/hexspeak.java#L59)
