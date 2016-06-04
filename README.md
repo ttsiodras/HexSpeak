@@ -93,7 +93,7 @@ benchmark just counts them: )*
     solve_recursive_count(words, 0, [], targetLength, cnt)
     print "Total:", cnt[0]
 
-Clojure: (* using a `volatile!` (faster than `atom`) for the counter*)
+Clojure: *(using a `volatile!` (faster than `atom`) for the counter)*
 
     (defn solve
       [words-per-length target-length phrase-len used-words counter]
