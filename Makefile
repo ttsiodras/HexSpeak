@@ -108,24 +108,10 @@ endif
 # ...then, run them:
 #
 
-ifdef PYTHON2
-	$(MAKE) benchPython
+ifdef GXX
+	$(MAKE) benchCPP
 else
-	@printf "$(YELLOW)You are missing 'python2' - skipping Python benchmark...$(NO_COLOR)"
-endif
-ifdef LEIN
-ifdef JAVA
-	$(MAKE) benchClojure
-else
-	@printf "$(YELLOW)You are missing 'java' - skipping Clojure benchmark...$(NO_COLOR)"
-endif
-else
-	@printf "$(YELLOW)You are missing 'lein' - skipping Clojure benchmark...$(NO_COLOR)"
-endif
-ifdef PYPY
-	$(MAKE) benchPyPy
-else
-	@printf "$(YELLOW)You are missing 'pypy' - skipping PyPy benchmark...$(NO_COLOR)"
+	@printf "$(YELLOW)You are missing 'g++' - skipping C++ benchmark...$(NO_COLOR)"
 endif
 ifdef JAVAC
 ifdef JAVA
@@ -136,10 +122,24 @@ endif
 else
 	@printf "$(YELLOW)You are missing 'javac' - skipping Java benchmark...$(NO_COLOR)"
 endif
-ifdef GXX
-	$(MAKE) benchCPP
+ifdef PYPY
+	$(MAKE) benchPyPy
 else
-	@printf "$(YELLOW)You are missing 'g++' - skipping C++ benchmark...$(NO_COLOR)"
+	@printf "$(YELLOW)You are missing 'pypy' - skipping PyPy benchmark...$(NO_COLOR)"
+endif
+ifdef LEIN
+ifdef JAVA
+	$(MAKE) benchClojure
+else
+	@printf "$(YELLOW)You are missing 'java' - skipping Clojure benchmark...$(NO_COLOR)"
+endif
+else
+	@printf "$(YELLOW)You are missing 'lein' - skipping Clojure benchmark...$(NO_COLOR)"
+endif
+ifdef PYTHON2
+	$(MAKE) benchPython
+else
+	@printf "$(YELLOW)You are missing 'python2' - skipping Python benchmark...$(NO_COLOR)"
 endif
 
 ###############################################
