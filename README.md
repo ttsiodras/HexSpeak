@@ -39,8 +39,8 @@ Python:
                 words.setdefault(len(word), []).append(word)
     words[1] = ['a']
 
-Clojure: (*refactored logic in two functions - one filters
-the words, another groups them via `group-by` based on length: *)
+Clojure: *(refactored logic in two functions - one filters
+the words, another groups them via `group-by` based on length: )*
 
     (defn good-words [rdr letters]
       (let [matcher (re-pattern (str "^[" letters "]*$"))
