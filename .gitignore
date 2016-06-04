@@ -10,3 +10,7 @@ pom.xml.asc
 .hgignore
 .hg/
 *swp
+**/deps.*
+**/objs.*
+**/bin.debug
+**/bin.release
