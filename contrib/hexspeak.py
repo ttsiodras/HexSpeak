@@ -6,7 +6,7 @@ import sys
 
 def solve_recursive_count(words, currentLen, used, targetLength, cnt):
     for i in xrange(1, targetLength - currentLen + 1):
-        for word in words.get(i, []):
+        for word in words[i]:
             if word in used:
                 continue
             if i != targetLength - currentLen:
@@ -34,7 +34,7 @@ def solve_nonrecursive_count(words, targetLength):
 
 
 def main():
-    words = {}
+    words = [[] for _ in xrange(128)]
     if len(sys.argv) != 4:
         targetLength = 8
         letters = 'abcdef01'
@@ -49,8 +49,8 @@ def main():
         if len(word) > 2 and m.match(word):
             if word in ['aaa', 'aba', 'abc']:
                 continue
-            if word not in words.get(len(word), []):
-                words.setdefault(len(word), []).append(word)
+            if word not in words[len(word)]:
+                words[len(word)].append(word)
     words[1] = ['a']
     cnt = [0]
     import time
