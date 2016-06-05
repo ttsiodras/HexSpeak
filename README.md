@@ -183,7 +183,7 @@ We can see the spread of the measurements by creating a Tukey boxplot...
 
 ![Tukey boxplot of performance for PyPy, Java and C++](https://raw.githubusercontent.com/ttsiodras/HexSpeak/master/contrib/boxplot.png "Tukey boxplot of performance for PyPy, Java and C++")
 
-...where it becomes clear that even though the JVM starts at approximately
+...where it becomes clear (from the outliers) that even though the JVM starts at approximately
 the same speed as PyPy, HotSpot quickly kicks-in and moves performance
 much closer to C++ levels.
 
