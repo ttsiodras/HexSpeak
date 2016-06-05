@@ -165,9 +165,9 @@ good way) - and of course, C++ speed is on a class of its own...
 
 Benchmarking under the JVM can be perilous - the established wisdom
 is that for Java you use
-[https://github.com/ttsiodras/HexSpeak/tree/master/contrib/HexSpeak-bench.java.with.JMH/benchmarks](JMH)
+[JMH](https://github.com/ttsiodras/HexSpeak/tree/master/contrib/HexSpeak-bench.java.with.JMH/benchmarks)
 and for Clojure you use 
-[https://github.com/ttsiodras/HexSpeak/blob/criterium/src/thanassis/hexspeak.clj#L82](Criterium).
+[Criterium](https://github.com/ttsiodras/HexSpeak/blob/criterium/src/thanassis/hexspeak.clj#L82).
 
 As you can see in the links to my code above, I used both of them. For micro-benchmarks
 these tools may indeed provide different results - but in my case, there was no 
