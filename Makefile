@@ -14,6 +14,7 @@ YELLOW=\033[33;01m
 # Detect the tools installed, to select benchmarks
 
 EXPECT:=$(shell command -v expect 2>/dev/null)
+TEE:=$(shell command -v tee 2>/dev/null)
 GREP:=$(shell command -v grep 2>/dev/null)
 AWK:=$(shell command -v awk 2>/dev/null)
 BASH:=$(shell command -v bash 2>/dev/null)
@@ -78,6 +79,9 @@ ifndef AWK
 endif
 ifndef BASH
 	$(error "You appear to be missing the 'bash' shell...")
+endif
+ifndef TEE
+	$(error "You appear to be missing 'tee'...")
 endif
 ifndef PYTHON2
 	$(error "You appear to be missing 'python2'...")
@@ -146,16 +150,18 @@ endif
 # All the language-specific benchmarking logic 
 
 benchPython:
+	@mkdir -p results
 	@echo
 	@printf "$(GREEN)Benchmarking Python (best out of 10 executions)...$(NO_COLOR)"
-	@bash -c "for i in {1..10} ; do ./contrib/hexspeak.py 14 abcdef contrib/words ; done" | awk '{print $$3; fflush();}' | contrib/stats.py | grep Min
+	@bash -c "for i in {1..10} ; do ./contrib/hexspeak.py 14 abcdef contrib/words ; done" | awk '{print $$3; fflush();}' | tee results/timings.python.txt | contrib/stats.py | grep Min
 	@echo
 
 
 benchPyPy:
+	@mkdir -p results
 	@echo
 	@printf "$(GREEN)Benchmarking PyPy (best out of 10 executions)...$(NO_COLOR)"
-	@bash -c "for i in {1..10} ; do pypy ./contrib/hexspeak.py 14 abcdef contrib/words ; done" | awk '{print $$3; fflush();}' | contrib/stats.py | grep Min
+	@bash -c "for i in {1..10} ; do pypy ./contrib/hexspeak.py 14 abcdef contrib/words ; done" | awk '{print $$3; fflush();}' | tee results/timings.pypy.txt | contrib/stats.py | grep Min
 	@echo
 
 
@@ -163,9 +169,10 @@ benchClojure:	| ${TARGET_CLOJURE}
 ifndef JAVA
 	$(error "You appear to be missing the 'java' JRE...")
 endif
+	@mkdir -p results
 	@echo
 	@printf "$(GREEN)Benchmarking Clojure (best out of 10 executions)...$(NO_COLOR)"
-	@java -jar ${TARGET_CLOJURE} 14 abcdef contrib/words | grep --line-buffered Elapsed | awk '{print $$3; fflush();}' | contrib/stats.py | grep Min
+	@java -jar ${TARGET_CLOJURE} 14 abcdef contrib/words | grep --line-buffered Elapsed | awk '{print $$3; fflush();}' | tee results/timings.clojure.txt | contrib/stats.py | grep Min
 	@echo
 
 
@@ -173,16 +180,18 @@ benchJava:	${TARGET_JAVA}
 ifndef JAVA
 	$(error "You appear to be missing the 'java' JRE...")
 endif
+	@mkdir -p results
 	@echo
 	@printf "$(GREEN)Benchmarking Java (best out of 10 executions)...$(NO_COLOR)"
-	@cd contrib ; java hexspeak | awk '{print $$3; fflush();}' | ./stats.py | grep Min
+	@cd contrib ; java hexspeak | awk '{print $$3; fflush();}' | tee ../results/timings.java.txt | ./stats.py | grep Min
 	@echo
 
 
 benchCPP:	${TARGET_CPP}
+	@mkdir -p results
 	@echo
 	@printf "$(GREEN)Benchmarking C++ (best out of 10 executions)...$(NO_COLOR)"
-	@cd ${TARGET_CPP_DIR} ; ./hexspeak | awk '{print $$3; fflush();}' | ../../stats.py | grep Min
+	@cd ${TARGET_CPP_DIR} ; pwd ; ./hexspeak | awk '{print $$3; fflush();}' | tee ../../../results/timings.cpp.txt | ../../stats.py | grep Min
 	@echo
 
 
@@ -240,6 +249,11 @@ else
 	@printf "$(YELLOW)You are missing 'pypy' - skipping PyPy test...$(NO_COLOR)"
 endif
 
+##############################
+# Tukey Boxplot of the results
+boxplot:	|bench
+	cd contrib ; ./boxplot.py
+	@printf "$(YELLOW)Generated contrib/boxplot.png$(NO_COLOR)"
 
 ###########
 # Cleanup

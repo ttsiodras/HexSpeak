@@ -175,6 +175,18 @@ discernible difference in the results. Note that I am running the algorithm
 10 times and taking the minimal time ; and both tools provided very similar results
 to my naive measurements with Clojure's `time` and Java's `System.nanotime`.
 
+## BoxPlot
+
+We can see the spread of the measurements by creating a Tukey boxplot...
+
+    $ make boxplot
+
+![Tukey boxplot of performance for PyPy, Java and C++](https://raw.githubusercontent.com/ttsiodras/HexSpeak/master/contrib/boxplot.png Tukey boxplot of performance for PyPy, Java and C++)
+
+...where it becomes clear that even though the JVM starts at approximately
+the same speed as PyPy, HotSpot quickly kicks-in and moves performance
+much closer to C++ levels.
+
 ## Concluding thoughts
 
 I liked playing with Clojure. I have [a soft spot for Lisps](https://www.thanassis.space/score4.html#lisp)
