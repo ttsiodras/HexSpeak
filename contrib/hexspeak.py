@@ -1,11 +1,11 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 import re
 import sys
 
 
 def solve_recursive_count(words, currentLen, used, targetLength, cnt):
-    for i in xrange(1, targetLength - currentLen + 1):
+    for i in range(1, targetLength - currentLen + 1):
         for word in words[i]:
             if word in used:
                 continue
@@ -25,7 +25,7 @@ def solve_nonrecursive_count(words, targetLength):
         if currentLen == targetLength:
             cnt += 1
         else:
-            for i in xrange(1, targetLength - currentLen + 1):
+            for i in range(1, targetLength - currentLen + 1):
                 for word in words.get(i, []):
                     if word not in wordsSoFar:
                         candidates.append(
@@ -34,7 +34,7 @@ def solve_nonrecursive_count(words, targetLength):
 
 
 def main():
-    words = [[] for _ in xrange(128)]
+    words = [[] for _ in range(128)]
     if len(sys.argv) != 4:
         targetLength = 8
         letters = 'abcdef01'
@@ -57,7 +57,7 @@ def main():
     start = time.time()
     solve_recursive_count(words, 0, [], targetLength, cnt)
     end = time.time()
-    print cnt[0], "in", 1000*(end-start), "ms"
+    print(cnt[0], "in", 1000*(end-start), "ms")
     #
     # Not using recursion is much slower! Apparently cache is thrashed
     #

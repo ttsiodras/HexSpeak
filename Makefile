@@ -23,7 +23,7 @@ JAVA:=$(shell command -v java 2>/dev/null)
 JAVAC:=$(shell command -v javac 2>/dev/null)
 GXX:=$(shell command -v g++ 2>/dev/null)
 PYTHON2:=$(shell command -v python2 2>/dev/null)
-PYPY:=$(shell command -v pypy 2>/dev/null)
+PYPY:=$(shell command -v pypy3 2>/dev/null)
 
 ###########################################################
 # This is a clojure experiment - that's our primary target:
@@ -129,7 +129,7 @@ endif
 ifdef PYPY
 	$(MAKE) benchPyPy
 else
-	@printf "$(YELLOW)You are missing 'pypy' - skipping PyPy benchmark...$(NO_COLOR)"
+	@printf "$(YELLOW)You are missing 'pypy3' - skipping PyPy benchmark...$(NO_COLOR)"
 endif
 ifdef LEIN
 ifdef JAVA
@@ -161,7 +161,7 @@ benchPyPy:
 	@mkdir -p results
 	@echo
 	@printf "$(GREEN)Benchmarking PyPy (best out of 10 executions)...$(NO_COLOR)"
-	@bash -c "for i in {1..10} ; do pypy ./contrib/hexspeak.py 14 abcdef contrib/words ; done" | awk '{print $$3; fflush();}' | tee results/timings.pypy.txt | contrib/stats.py | grep Min
+	@bash -c "for i in {1..10} ; do pypy3 ./contrib/hexspeak.py 14 abcdef contrib/words ; done" | awk '{print $$3; fflush();}' | tee results/timings.pypy.txt | contrib/stats.py | grep Min
 	@echo
 
 
@@ -246,7 +246,7 @@ endif
 ifdef PYPY
 	@./test/verifyResultFor14_pypy.expect | grep -v --line-buffered Elapsed | grep -v --line-buffered 3020796
 else
-	@printf "$(YELLOW)You are missing 'pypy' - skipping PyPy test...$(NO_COLOR)"
+	@printf "$(YELLOW)You are missing 'pypy3' - skipping PyPy test...$(NO_COLOR)"
 endif
 
 ##############################
