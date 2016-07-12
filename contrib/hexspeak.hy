@@ -58,22 +58,17 @@ Couldn't resist! Read about hylang here:
   "Using the list of valid options from our list of words,
   recurse to form complete phrases of the desired target-length,
   and count them all up to see how many there are."
-  (do
-    ;(print target-length phrase-len used-words)
-    (for [i (range (- target-length phrase-len))]
-      (for [w (gget words-per-length i [])]
-        (do
-          ;(print "Checking" w "due to" i)
-          (if (not (in w used-words))
-            (if (= target-length (+ i phrase-len 1))
-              (do 
-                ;(print "Reached target!" target-length "via" w)
-                (global counter)
-                (setv counter (inc counter)))
-              (do
-                (.add used-words w)
-                (solve words-per-length target-length (+ phrase-len (inc i)) used-words)
-                (.remove used-words w)))))))))
+  (for [i (range (- target-length phrase-len))]
+    (for [w (gget words-per-length i [])]
+      (if (not (in w used-words))
+        (if (= target-length (+ i phrase-len 1))
+          (do
+            (global counter)
+            (setv counter (inc counter)))
+          (do
+            (.add used-words w)
+            (solve words-per-length target-length (+ phrase-len (inc i)) used-words)
+            (.remove used-words w)))))))
 
 (defmain [&rest args]
   "Expects as cmd-line arguments:
