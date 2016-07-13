@@ -43,15 +43,9 @@ Couldn't resist! Read about hylang here:
                       (list-comp
                         (, (get kv 0) (list (get kv 1)))
                         [kv grouped]))]
-    (list (map (fn [i] (.get in-map-form (inc i) [])) (range (max in-map-form))))))
+    (list (map (fn [i] (.get in-map-form (inc i) [])) (range 128)))))
 
 (setv counter 0)
-
-(defn gget [l i default]
-  "Returns l[i] if i fits - else default"
-  (try
-    (get l i)
-    (except [IndexError] default)))
 
 (defn solve
   [words-per-length target-length phrase-len used-words]
@@ -59,7 +53,7 @@ Couldn't resist! Read about hylang here:
   recurse to form complete phrases of the desired target-length,
   and count them all up to see how many there are."
   (for [i (range (- target-length phrase-len))]
-    (for [w (gget words-per-length i [])]
+    (for [w (get words-per-length i)]
       (if (not (in w used-words))
         (if (= target-length (+ i phrase-len 1))
           (do
