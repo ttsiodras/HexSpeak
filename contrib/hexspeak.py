@@ -33,16 +33,8 @@ def solve_nonrecursive_count(words, targetLength):
     return cnt
 
 
-def main():
+def get_words_per_length(dictionaryFile, letters):
     words = [[] for _ in range(128)]
-    if len(sys.argv) != 4:
-        targetLength = 8
-        letters = 'abcdef01'
-        dictionaryFile = '/usr/share/dict/words'
-    else:
-        targetLength = int(sys.argv[1])
-        letters = sys.argv[2].replace('0', 'o').replace('1', 'il')
-        dictionaryFile = sys.argv[3]
     m = re.compile(r'^[' + letters + ']*$')
     for word in open(dictionaryFile):
         word = word.strip()
@@ -52,6 +44,19 @@ def main():
             if word not in words[len(word)]:
                 words[len(word)].append(word)
     words[1] = ['a']
+    return words
+
+
+def main():
+    if len(sys.argv) != 4:
+        targetLength = 8
+        letters = 'abcdef01'
+        dictionaryFile = '/usr/share/dict/words'
+    else:
+        targetLength = int(sys.argv[1])
+        letters = sys.argv[2].replace('0', 'o').replace('1', 'il')
+        dictionaryFile = sys.argv[3]
+    words = get_words_per_length(dictionaryFile, letters)
     cnt = [0]
     import time
     start = time.time()
