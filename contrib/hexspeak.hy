@@ -65,10 +65,7 @@ Couldn't resist! Read about hylang here:
           (do
             (global counter)
             (setv counter (inc counter)))
-          (do
-            (.add used-words w)
-            (solve words-per-length target-length (+ phrase-len (inc i)) used-words)
-            (.remove used-words w)))))))
+        (solve words-per-length target-length (+ phrase-len (inc i)) (+ used-words [w])))))))
 
 (defmain [&rest args]
   "Expects as cmd-line arguments:
@@ -88,7 +85,7 @@ Couldn't resist! Read about hylang here:
         (global counter)
         (setv counter 0)
         (setv before (.time time))
-        (solve words-per-length phrase-length 0 #{})
+        (solve words-per-length phrase-length 0 [])
         (setv after (.time time))
         (print (.format "Total: {} in {} ms." counter (* 1000 (- after before))))
         (. sys stdout flush)))))
