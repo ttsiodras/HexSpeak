@@ -2,6 +2,8 @@
 
 import re
 import sys
+import time
+from collections import deque
 
 
 def solve_recursive_count(words, currentLen, used, targetLength, cnt):
@@ -17,7 +19,6 @@ def solve_recursive_count(words, currentLen, used, targetLength, cnt):
 
 
 def solve_nonrecursive_count(words, targetLength):
-    from collections import deque
     candidates = deque([([], 0)])
     cnt = 0
     while candidates:
@@ -58,11 +59,10 @@ def main():
         dictionaryFile = sys.argv[3]
     words = get_words_per_length(dictionaryFile, letters)
     cnt = [0]
-    import time
     start = time.time()
     solve_recursive_count(words, 0, [], targetLength, cnt)
     end = time.time()
-    print(cnt[0], "in", 1000*(end-start), "ms")
+    print("%d in %7.3f ms" % (cnt[0], 1000*(end-start)))
     #
     # Not using recursion is much slower! Apparently cache is thrashed
     #
