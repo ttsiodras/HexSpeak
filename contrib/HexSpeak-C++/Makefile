@@ -29,7 +29,7 @@ INCLUDEFLAGS= -I ../Library -I src -std=c++14
 
 # Separate compile options per configuration
 ifeq ($(CFG),debug)
-CXXFLAGS += -g -Wall -D_DEBUG ${INCLUDEFLAGS}
+CXXFLAGS += -g -Og -Wall -D_DEBUG ${INCLUDEFLAGS}
 else
 CXXFLAGS += -O2 -Wall ${INCLUDEFLAGS}
 endif
