@@ -166,6 +166,11 @@ endif
 else
 	@printf "$(YELLOW)You are missing 'lein' - skipping Clojure benchmark...$(NO_COLOR)"
 endif
+ifdef PYPY
+	$(MAKE) benchHyLang
+else
+	@printf "$(YELLOW)You are missing 'pypy3' - skipping HyLang benchmark...$(NO_COLOR)"
+endif
 ifdef PYTHON2
 	$(MAKE) benchPython
 else
@@ -208,6 +213,7 @@ endif
 	@printf "$(GREEN)Benchmarking Clojure (best out of 10 executions)...$(NO_COLOR)"
 	@java -jar ${TARGET_CLOJURE} 14 abcdef contrib/words | grep --line-buffered Elapsed | awk '{print $$3; fflush();}' | tee results/timings.clojure.txt | contrib/stats.py | grep Min
 	@echo
+	@echo
 
 
 benchJava:	${TARGET_JAVA}
@@ -228,6 +234,9 @@ benchCPP:	${TARGET_CPP}
 	@cd ${TARGET_CPP_DIR} ; pwd ; ./hexspeak | awk '{print $$3; fflush();}' | tee ../../../results/timings.cpp.txt | ../../stats.py | grep Min
 	@echo
 
+benchHyLang:
+	@$(MAKE) -C contrib/HyLang
+	@echo
 
 ########################################################################
 # Tests - verifying that there are 3020796 hexspeak phrases of length 14
