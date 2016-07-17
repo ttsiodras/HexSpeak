@@ -22,8 +22,9 @@ LEIN:=$(shell command -v lein 2>/dev/null)
 JAVA:=$(shell command -v java 2>/dev/null)
 JAVAC:=$(shell command -v javac 2>/dev/null)
 GXX:=$(shell command -v g++ 2>/dev/null)
-PYTHON2:=$(shell command -v python2 2>/dev/null)
-PYPY:=$(shell command -v pypy3 2>/dev/null)
+PYTHON3:=$(shell command -v python3 2>/dev/null)
+PYPY3:=$(shell command -v pypy3 2>/dev/null)
+VIRTUALENV3:=$(shell command -v virtualenv3 --version 2>/dev/null)
 SHEDSKIN:=$(shell which shedskin 2>/dev/null)
 
 ###########################################################
@@ -101,7 +102,7 @@ endif
 ifndef TEE
 	$(error "You appear to be missing 'tee'...")
 endif
-ifndef PYTHON2
+ifndef PYTHON3
 	$(error "You appear to be missing 'python2'...")
 endif
 
@@ -152,7 +153,7 @@ ifdef SHEDSKIN
 else
 	@printf "$(YELLOW)You are missing 'ShedSkin' - skipping ShedSkin benchmark...$(NO_COLOR)"
 endif
-ifdef PYPY
+ifdef PYPY3
 	$(MAKE) benchPyPy
 else
 	@printf "$(YELLOW)You are missing 'pypy3' - skipping PyPy benchmark...$(NO_COLOR)"
@@ -166,12 +167,16 @@ endif
 else
 	@printf "$(YELLOW)You are missing 'lein' - skipping Clojure benchmark...$(NO_COLOR)"
 endif
-ifdef PYPY
+ifdef PYPY3
+ifdef VIRTUALENV3
 	$(MAKE) benchHyLang
+else
+	@printf "$(YELLOW)You are missing 'virtualenv3' - skipping HyLang benchmark...$(NO_COLOR)"
+endif
 else
 	@printf "$(YELLOW)You are missing 'pypy3' - skipping HyLang benchmark...$(NO_COLOR)"
 endif
-ifdef PYTHON2
+ifdef PYTHON3
 	$(MAKE) benchPython
 else
 	@printf "$(YELLOW)You are missing 'python2' - skipping Python benchmark...$(NO_COLOR)"
@@ -281,12 +286,12 @@ endif
 ifdef GXX
 	@./test/verifyResultFor14_cpp.expect | grep -v --line-buffered Elapsed | grep -v --line-buffered 3020796
 endif
-ifdef PYTHON2
+ifdef PYTHON3
 	@./test/verifyResultFor14_cpython.expect | grep -v --line-buffered Elapsed | grep -v --line-buffered 3020796
 else
 	@printf "$(YELLOW)You are missing 'python2' - skipping Python test...$(NO_COLOR)"
 endif
-ifdef PYPY
+ifdef PYPY3
 	@./test/verifyResultFor14_pypy.expect | grep -v --line-buffered Elapsed | grep -v --line-buffered 3020796
 else
 	@printf "$(YELLOW)You are missing 'pypy3' - skipping PyPy test...$(NO_COLOR)"

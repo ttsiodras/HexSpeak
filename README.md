@@ -45,9 +45,8 @@ it also allowed me to execute the result under PyPy.
 The table below shows the results I get in my laptop from executing my
 implementations using all the languages/tools:
 
-|-----------------|------------|
 | Language/Tool   | Time in ms |
-|-----------------|------------|
+| --------------- | ---------- |
 | C++             |   34.96600 |
 | Java            |  104.00000 |
 | Python/ShedSkin |  357.70300 |
