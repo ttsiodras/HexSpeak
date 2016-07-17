@@ -35,7 +35,7 @@ the same Python code 7x times faster than CPython (3x faster than Clojure).
 Very impressive.
 
 **Update:** But this experiment wasn't really about speed - it was about my desire
-to play with Lisps again. So I added an [implementation](contrib/hexspeak.hy)
+to play with Lisps again. So I added an [implementation](contrib/HyLang/hexspeak.hy)
 in [a very Pythonic Lisp (HyLang)](https://github.com/hylang). Hy runs
 my code 3x slower than CPython, but at this point I don't care; it was
 so much fun, playing with it :-) And since there's a hy2py converter,
