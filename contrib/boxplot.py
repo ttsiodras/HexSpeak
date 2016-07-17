@@ -12,7 +12,9 @@ import matplotlib.pyplot as plt
 #    "timings.python.txt",
 #    "timings.clojure.txt",
 languages = [
+    "timings.clojure.txt",
     "timings.pypy.txt",
+    "timings.shedskin.txt",
     "timings.java.txt",
     "timings.cpp.txt",
 ]

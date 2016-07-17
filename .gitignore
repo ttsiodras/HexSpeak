@@ -15,3 +15,7 @@ pom.xml.asc
 **/bin.debug
 **/bin.release
 results
+contrib/shedskin-compile-to-native/Makefile
+contrib/shedskin-compile-to-native/hexspeak
+contrib/shedskin-compile-to-native/hexspeak.cpp
+contrib/shedskin-compile-to-native/hexspeak.hpp

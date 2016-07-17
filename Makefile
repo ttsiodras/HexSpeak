@@ -24,6 +24,7 @@ JAVAC:=$(shell command -v javac 2>/dev/null)
 GXX:=$(shell command -v g++ 2>/dev/null)
 PYTHON2:=$(shell command -v python2 2>/dev/null)
 PYPY:=$(shell command -v pypy3 2>/dev/null)
+SHEDSKIN:=$(shell which shedskin 2>/dev/null)
 
 ###########################################################
 # This is a clojure experiment - that's our primary target:
@@ -66,6 +67,23 @@ endif
 	@printf "$(GREEN)Compiling C++ code...$(NO_COLOR)"
 	$(MAKE) -C contrib/HexSpeak-C++/ CFG=release
 
+########################
+# And also with Shedskin
+
+TARGET_SHEDSKIN_DIR=contrib/shedskin-compile-to-native
+TARGET_SHEDSKIN=${TARGET_SHEDSKIN_DIR}/hexspeak
+SHEDSKIN_SRC=contrib/shedskin-compile-to-native/hexspeak.cpp
+
+${TARGET_SHEDSKIN}:	${SHEDSKIN_SRC}
+ifndef GXX
+	$(error "You appear to be missing 'g++' (C++ compiler)")
+endif
+	@printf "$(GREEN)Compiling ShedSkin C++ code...$(NO_COLOR)"
+	$(MAKE) -C ${TARGET_SHEDSKIN_DIR}
+
+${SHEDSKIN_SRC}:	contrib/hexspeak.py
+	@printf "$(GREEN)Creating C++ code via ShedSkin...$(NO_COLOR)"
+	@cd contrib/shedskin-compile-to-native/ && shedskin hexspeak.py
 
 #############################################
 # To perform any benchmarking, we need these
@@ -106,6 +124,9 @@ endif
 endif
 ifdef GXX
 	$(MAKE) ${TARGET_CPP}
+ifdef SHEDSKIN
+	$(MAKE) ${TARGET_SHEDSKIN}
+endif
 endif
 
 #
@@ -125,6 +146,11 @@ else
 endif
 else
 	@printf "$(YELLOW)You are missing 'javac' - skipping Java benchmark...$(NO_COLOR)"
+endif
+ifdef SHEDSKIN
+	$(MAKE) benchShedSkin
+else
+	@printf "$(YELLOW)You are missing 'ShedSkin' - skipping ShedSkin benchmark...$(NO_COLOR)"
 endif
 ifdef PYPY
 	$(MAKE) benchPyPy
@@ -154,6 +180,14 @@ benchPython:
 	@echo
 	@printf "$(GREEN)Benchmarking Python (best out of 10 executions)...$(NO_COLOR)"
 	@bash -c "for i in {1..10} ; do ./contrib/hexspeak.py 14 abcdef contrib/words ; done" | awk '{print $$3; fflush();}' | tee results/timings.python.txt | contrib/stats.py | grep Min
+	@echo
+
+
+benchShedSkin:	| ${TARGET_SHEDSKIN}
+	@mkdir -p results
+	@echo
+	@printf "$(GREEN)Benchmarking ShedSkin (best out of 10 executions)...$(NO_COLOR)"
+	@bash -c "for i in {1..10} ; do ${TARGET_SHEDSKIN} 14 abcdef contrib/words ; done" | awk '{print $$3; fflush();}' | tee results/timings.shedskin.txt | contrib/stats.py | grep Min
 	@echo
 
 
@@ -247,6 +281,11 @@ ifdef PYPY
 	@./test/verifyResultFor14_pypy.expect | grep -v --line-buffered Elapsed | grep -v --line-buffered 3020796
 else
 	@printf "$(YELLOW)You are missing 'pypy3' - skipping PyPy test...$(NO_COLOR)"
+endif
+ifdef SHEDSKIN
+	@./test/verifyResultFor14_shedskin.expect | grep -v --line-buffered Elapsed | grep -v --line-buffered 3020796
+else
+	@printf "$(YELLOW)You are missing 'ShedSkin' - skipping ShedSkin test...$(NO_COLOR)"
 endif
 
 ##############################
