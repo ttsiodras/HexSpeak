@@ -87,9 +87,8 @@ the words, another groups them via `group-by` based on length: )*
             forbidden #{"aaa" "aba" "abc"}]
         (doall (->> (line-seq rdr)
                     (filter #(and (> (.length ^String %) 2)
-                                  (not (contains? forbidden %))
                                   (re-matches matcher %)
-                                  ))))))
+                                  (not (contains? forbidden %))))))))
 
     (defn get-words-per-length [letters]
       (let [input-file "/usr/share/dict/words"
@@ -156,8 +155,9 @@ Both of the languages allow for equally succinct implementations.
 
 I added a `bench` rule in my Makefile, that measures 10 runs of `solve`
 for 14-character long HexSpeak phrases. I used `time.time()` in Python,
-and Clojure's `time` to do the measurements. I took the minimum of the
-10 runs, to avoid (a) the JVM's startup cost and (b) to also take advantage
+and Clojure's `time` to do the measurements *(but see also section below
+about JMH and Criterium)*. I took the minimum of the 10 runs,
+to avoid (a) the JVM's startup cost and (b) to also take advantage
 of the 'warm-up' of the HotSpot technology *(the first couple of `solve`
 runs are much slower than the rest, since the JVM figures out the best
 places to JIT at run-time)*.
@@ -234,11 +234,13 @@ is that for Java you use
 and for Clojure you use
 [Criterium](https://github.com/ttsiodras/HexSpeak/blob/criterium/src/thanassis/hexspeak.clj#L82).
 
-As you can see in the links to my code above, I used both of them. For micro-benchmarks
-these tools may indeed provide different results - but in my case, there was no
-discernible difference in the results. Note that I am running the algorithm
-10 times and taking the minimal time ; and both tools provided very similar results
-to my naive measurements with Clojure's `time` and Java's `System.nanotime`.
+As you can see in the links to my code above, I tried both of them.
+For micro-benchmarks these tools may indeed provide results that are much
+different that plain old Clojure `time` or Java's `System.nanotime` - but
+in this case, there was no discernible difference between the "advanced"
+timing results from JMH and Criterium, and those of the "simple" methods.
+*Keep in mind that in the "simple" methods the algorithm is run 10 times
+and the minimum time is taken.*
 
 ## BoxPlot
 
