@@ -36,38 +36,39 @@ formed from the selected hex nibbles. They are then arranged
 in a way that allows quick lookups of words for a specific length:
 
 Python:
-    ```python
-    def get_words_per_length(dictionaryFile, letters):
-        words = [[] for _ in range(128)]
-        m = re.compile(r'^[' + letters + ']*$')
-        for word in open(dictionaryFile):
-            word = word.strip()
-            if len(word) > 2 and m.match(word):
-                if word in ['aaa', 'aba', 'abc']:
-                    continue
-                if word not in words[len(word)]:
-                    words[len(word)].append(word)
-        words[1] = ['a']
-        return words
-    ```
+
+```python
+def get_words_per_length(dictionaryFile, letters):
+    words = [[] for _ in range(128)]
+    m = re.compile(r'^[' + letters + ']*$')
+    for word in open(dictionaryFile):
+        word = word.strip()
+        if len(word) > 2 and m.match(word):
+            if word in ['aaa', 'aba', 'abc']:
+                continue
+            if word not in words[len(word)]:
+                words[len(word)].append(word)
+    words[1] = ['a']
+    return words
+```
 
 Clojure: *(refactored the logic in two functions - one filters
 the words, another groups them via `group-by` based on length: )*
 
-    ```clojure
-    (defn good-words [rdr letters]
-      (let [matcher (re-pattern (str "^[" letters "]*$"))
-            forbidden #{"aaa" "aba" "abc"}]
-        (doall (->> (line-seq rdr)
-                    (filter #(and (> (.length ^String %) 2)
-                                  (re-matches matcher %)
-                                  (not (contains? forbidden %))))))))
+```clojure
+(defn good-words [rdr letters]
+  (let [matcher (re-pattern (str "^[" letters "]*$"))
+        forbidden #{"aaa" "aba" "abc"}]
+    (doall (->> (line-seq rdr)
+                (filter #(and (> (.length ^String %) 2)
+                              (re-matches matcher %)
+                              (not (contains? forbidden %))))))))
 
-    (defn get-words-per-length [dictionary-file letters]
-      (let [candidates (with-open [rdr (clojure.java.io/reader dictionary-file)]
-                         (good-words rdr letters))]
-        (group-by #(.length ^String %) (concat candidates ["a"]))))
-    ```
+(defn get-words-per-length [dictionary-file letters]
+  (let [candidates (with-open [rdr (clojure.java.io/reader dictionary-file)]
+                     (good-words rdr letters))]
+    (group-by #(.length ^String %) (concat candidates ["a"]))))
+```
 
 Testing the Clojure code from the REPL - showing 3- and 4-letter candidate words:
 
@@ -81,18 +82,18 @@ Testing the Clojure code from the REPL - showing 3- and 4-letter candidate words
 
 Scala: *(Succinct, type-safe... and fast! see below)*
 
-    ```scala
-    def get_words_per_length(dictionaryFile: String, letters: String) = {
-      val p = new Regex("^[" ++ letters ++ "]*$")
-      val forbidden = List("aaa", "aba", "abc")
-      ("a" :: Source.fromFile(dictionaryFile).getLines().filter(
-        l => 
-          l.length > 2 &&
-          p.findFirstIn(l).nonEmpty &&
-          !forbidden.contains(l)).toList).
-      groupBy(_.length)
-    }
-    ```
+```scala
+def get_words_per_length(dictionaryFile: String, letters: String) = {
+  val p = new Regex("^[" ++ letters ++ "]*$")
+  val forbidden = List("aaa", "aba", "abc")
+  ("a" :: Source.fromFile(dictionaryFile).getLines().filter(
+    l => 
+      l.length > 2 &&
+      p.findFirstIn(l).nonEmpty &&
+      !forbidden.contains(l)).toList).
+  groupBy(_.length)
+}
+```
 
 Now that the candidate words are there, it's time to assemble them recursively.
 
