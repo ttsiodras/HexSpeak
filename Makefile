@@ -21,6 +21,8 @@ BASH:=$(shell command -v bash 2>/dev/null)
 LEIN:=$(shell command -v lein 2>/dev/null)
 JAVA:=$(shell command -v java 2>/dev/null)
 JAVAC:=$(shell command -v javac 2>/dev/null)
+SCALAC:=$(shell command -v scalac 2>/dev/null)
+SCALA:=$(shell command -v scala 2>/dev/null)
 GXX:=$(shell command -v g++ 2>/dev/null)
 PYTHON3:=$(shell command -v python3 2>/dev/null)
 PYPY3:=$(shell command -v pypy3 2>/dev/null)
@@ -53,6 +55,19 @@ ifndef JAVAC
 endif
 	@printf "$(GREEN)Compiling Java code...$(NO_COLOR)"
 	cd contrib ; javac hexspeak.java
+
+
+#############################################
+# And we also compared performance with Scala
+
+TARGET_SCALA=contrib/Scala/HexSpeak.class
+
+${TARGET_SCALA}:	contrib/Scala/hexspeak.scala
+ifndef SCALAC
+	$(error "You appear to be missing the 'scalac' compiler...")
+endif
+	@printf "$(GREEN)Compiling Scala code...$(NO_COLOR)"
+	cd contrib/Scala/ ; scalac -optimize hexspeak.scala
 
 
 ####################
@@ -148,6 +163,15 @@ endif
 else
 	@printf "$(YELLOW)You are missing 'javac' - skipping Java benchmark...$(NO_COLOR)"
 endif
+ifdef SCALAC
+ifdef SCALA
+	$(MAKE) benchScala
+else
+	@printf "$(YELLOW)You are missing 'scala' - skipping Scala benchmark...$(NO_COLOR)"
+endif
+else
+	@printf "$(YELLOW)You are missing 'scalac' - skipping Scala benchmark...$(NO_COLOR)"
+endif
 ifdef SHEDSKIN
 	$(MAKE) benchShedSkin
 else
@@ -232,6 +256,17 @@ endif
 	@echo
 
 
+benchScala:	${TARGET_SCALA}
+ifndef SCALA
+	$(error "You appear to be missing 'scala'...")
+endif
+	@mkdir -p results
+	@echo
+	@printf "$(GREEN)Benchmarking Scala (best out of 10 executions)...$(NO_COLOR)"
+	@cd contrib/Scala ; scala HexSpeak | awk '{print $$3; fflush();}' | tee ../../results/timings.scala.txt | ../stats.py | grep Min
+	@echo
+
+
 benchCPP:	${TARGET_CPP}
 	@mkdir -p results
 	@echo
@@ -268,6 +303,15 @@ endif
 else
 	@printf "$(YELLOW)You are missing 'javac' - skipping Java test...$(NO_COLOR)"
 endif
+ifdef SCALAC
+ifdef JAVA
+	$(MAKE) ${TARGET_SCALA}
+else
+	@printf "$(YELLOW)You are missing 'java' - skipping Scala test...$(NO_COLOR)"
+endif
+else
+	@printf "$(YELLOW)You are missing 'scalac' - skipping Scala test...$(NO_COLOR)"
+endif
 ifdef GXX
 	$(MAKE) ${TARGET_CPP}
 else
@@ -281,6 +325,11 @@ endif
 ifdef JAVAC
 ifdef JAVA
 	@./test/verifyResultFor14_java.expect | grep -v --line-buffered Elapsed | grep -v --line-buffered 3020796
+endif
+endif
+ifdef SCALAC
+ifdef JAVA
+	@./test/verifyResultFor14_scala.expect | grep -v --line-buffered Elapsed | grep -v --line-buffered 3020796
 endif
 endif
 ifdef GXX
@@ -312,7 +361,7 @@ boxplot:	|bench
 # Cleanup
 
 clean:
-	rm -rf ${TARGET_CLOJURE} ${TARGET_JAVA}
+	rm -rf ${TARGET_CLOJURE} ${TARGET_JAVA} ${TARGET_SCALA}
 	$(MAKE) -C contrib/HexSpeak-C++/ CFG=release clean
 
 .PHONY:	bench clean test benchPython benchPyPy benchClojure benchJava benchCPP

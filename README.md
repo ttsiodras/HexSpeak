@@ -41,6 +41,8 @@ my code 3x slower than CPython, but at this point I don't care; it was
 so much fun, playing with it :-) And since there's a hy2py converter,
 it also allowed me to execute the result under PyPy.
 
+**Update:** Added Scala, too - it's almost as fast as Java.
+
 The table below shows the results I get in my laptop from executing my
 implementations (using all the languages and all the tools). They all
 return the same number (3020796) of different phrases of length 14,
@@ -50,6 +52,7 @@ that can be formed from the 'ABCDEF' hex nibbles:
 | --------------- | ------------------------------------------- |
 | C++             |                                    34.96600 |
 | Java            |                                   104.00000 |
+| Scala           |                                   122.00000 |
 | Python/ShedSkin |                                   357.70300 |
 | Python/PyPy     |                                   520.08700 |
 | Clojure         |                                   911.20476 |
@@ -183,6 +186,9 @@ and serializes the output as Python bytecode - so I executed it with PyPy
 to give it a chance in the benchmarking. It ended up half-way between CPython
 and Clojure. It was also the most fun I've had in years :-)
 
+**UPDATE, two months later**: I added an implementation in Scala. It was fun,
+adding this - Scala has a REPL, so I figured out the APIs very quickly.
+And it's almost as fast as Java...
 
 Final speed results in my latop:
 
@@ -195,6 +201,10 @@ Final speed results in my latop:
 
     Benchmarking Java (best out of 10 executions)...
                 Min: 104.00000
+
+
+    Benchmarking Scala (best out of 10 executions)...
+                Min: 122.00000
 
 
     Benchmarking ShedSkin (best out of 10 executions)...
