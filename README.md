@@ -111,6 +111,16 @@ Testing the Clojure code - showing 3- and 4-letter candidate words:
     ==> ["abbe" "abed" "aced" "babe" "bade" "bead" "beef" "cafe" "caff" "ceca"
      "cede" "dace" "dded" "dead" "deaf" "deed" "face" "fade" "faff" "feed"]
 
+Scala: *(The Force is Strong in the ML family... Both expression-wise and
+execution-speed wise...)*
+
+    def get_words_per_length(dictionaryFile: String, letters: String) = {
+      val p = new Regex("^[" ++ letters ++ "]*$")
+      ("a" :: Source.fromFile(dictionaryFile).getLines().filter(
+        l => l.length > 2 && p.findFirstIn(l).nonEmpty && l != "a").toList).
+      groupBy(_.length)
+    }
+
 Now that the candidate words are there, it's time to assemble them recursively.
 
 ## Step 2: Assemble the candidates
@@ -151,7 +161,29 @@ Clojure: *a `volatile!` is faster than an `atom` (for the counter)*
         (time (solve words-per-length phrase-length 0 #{} counter))
         (printf "Total: %d\n" @counter)))
 
-Both of the languages allow for equally succinct implementations.
+Scala:
+
+    def solve_recursive_count(words:Map[Int, List[String]], currentLen:Int,
+                              used:List[String], targetLength:Int):Unit = {
+        for (i <- 1 to (targetLength - currentLen)) {
+          for(word <- words.getOrElse(i, List())) {
+            if (!used.contains(word)) {
+              if (i != targetLength - currentLen)
+                solve_recursive_count(words, currentLen + i, word :: used, targetLength)
+              else
+                cnt += 1
+            }
+          }
+        }
+      }
+
+    val words = get_words_per_length("../words", "abcdef")
+    cnt = 0
+    val s = System.currentTimeMillis
+    solve_recursive_count(words, 0, List(), 14)
+    println(cnt + " in " + (System.currentTimeMillis - s) + " ms")
+
+All three languages allow for equally succinct implementations.
 
 ## Step 3: Speed!
 
@@ -185,9 +217,9 @@ and serializes the output as Python bytecode - so I executed it with PyPy
 to give it a chance in the benchmarking. It ended up half-way between CPython
 and Clojure. It was also the most fun I've had in years :-)
 
-**UPDATE, two months later**: I added an implementation in Scala. It was fun,
-adding this - Scala has a REPL, so I figured out the APIs very quickly.
-And it's almost as fast as Java...
+**UPDATE, two months later**: I added an implementation in Scala. It was 
+unexpectedly easy, doing this - mostly because Scala has a REPL, so I was able
+to figure out the APIs very quickly. And it runs as fast as Java...
 
 Final speed results in my latop:
 
