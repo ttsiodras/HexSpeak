@@ -104,58 +104,64 @@ element of a list. In the initial version of the code, I was adding the phrases
 to this list so the caller of `solve` could print them - but this
 benchmark just counts them: )*
 
-    def solve_recursive_count(words, currentLen, used, targetLength, cnt):
-        for i in range(1, targetLength - currentLen + 1):
-            for word in words.get(i, []):
-                if word in used:
-                    continue
-                if i != targetLength - currentLen:
-                    solve_recursive_count(
-                        words, currentLen + i, used + [word], targetLength, cnt)
-                else:
-                    cnt[0] += 1
-    cnt = [0]
-    solve_recursive_count(words, 0, [], targetLength, cnt)
-    print "Total:", cnt[0]
+```python
+def solve_recursive_count(words, currentLen, used, targetLength, cnt):
+    for i in range(1, targetLength - currentLen + 1):
+        for word in words.get(i, []):
+            if word in used:
+                continue
+            if i != targetLength - currentLen:
+                solve_recursive_count(
+                    words, currentLen + i, used + [word], targetLength, cnt)
+            else:
+                cnt[0] += 1
+cnt = [0]
+solve_recursive_count(words, 0, [], targetLength, cnt)
+print "Total:", cnt[0]
+```
 
 Clojure: *a `volatile!` is faster than an `atom` (for the counter)*
 
-    (defn solve
-      [words-per-length target-length phrase-len used-words counter]
-      (dotimes [i (- target-length phrase-len)]
-        (doseq [w (get words-per-length (inc i) [])]
-          (if (not (contains? used-words w))
-            (if (= target-length (+ i phrase-len 1))
-              (vswap! counter inc) ;faster than swap! and atom
-              (solve words-per-length target-length (+ phrase-len (inc i))
-                     (conj used-words w) counter))))))
-    (let [counter (volatile! 0) ; faster than atom
-          words-per-length (get-words-per-length "abcdef")]
-      (do
-        (time (solve words-per-length phrase-length 0 #{} counter))
-        (printf "Total: %d\n" @counter)))
+```clojure
+(defn solve
+  [words-per-length target-length phrase-len used-words counter]
+  (dotimes [i (- target-length phrase-len)]
+    (doseq [w (get words-per-length (inc i) [])]
+      (if (not (contains? used-words w))
+        (if (= target-length (+ i phrase-len 1))
+          (vswap! counter inc) ;faster than swap! and atom
+          (solve words-per-length target-length (+ phrase-len (inc i))
+                 (conj used-words w) counter))))))
+(let [counter (volatile! 0) ; faster than atom
+      words-per-length (get-words-per-length "abcdef")]
+  (do
+    (time (solve words-per-length phrase-length 0 #{} counter))
+    (printf "Total: %d\n" @counter)))
+```
 
 Scala:
 
-    def solve_recursive_count(words:Map[Int, List[String]], currentLen:Int,
-                              used:List[String], targetLength:Int):Unit = {
-        for (i <- 1 to (targetLength - currentLen)) {
-          for(word <- words.getOrElse(i, List())) {
-            if (!used.contains(word)) {
-              if (i != targetLength - currentLen)
-                solve_recursive_count(words, currentLen + i, word :: used, targetLength)
-              else
-                cnt += 1
-            }
-          }
+```scala
+def solve_recursive_count(words:Map[Int, List[String]], currentLen:Int,
+                          used:List[String], targetLength:Int):Unit = {
+    for (i <- 1 to (targetLength - currentLen)) {
+      for(word <- words.getOrElse(i, List())) {
+        if (!used.contains(word)) {
+          if (i != targetLength - currentLen)
+            solve_recursive_count(words, currentLen + i, word :: used, targetLength)
+          else
+            cnt += 1
         }
       }
+    }
+  }
 
-    val words = get_words_per_length("../words", "abcdef")
-    cnt = 0
-    val s = System.currentTimeMillis
-    solve_recursive_count(words, 0, List(), 14)
-    println(cnt + " in " + (System.currentTimeMillis - s) + " ms")
+val words = get_words_per_length("../words", "abcdef")
+cnt = 0
+val s = System.currentTimeMillis
+solve_recursive_count(words, 0, List(), 14)
+println(cnt + " in " + (System.currentTimeMillis - s) + " ms")
+```
 
 All three languages allow for equally succinct implementations.
 
