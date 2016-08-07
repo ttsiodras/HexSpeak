@@ -28,11 +28,10 @@ But since Clojure uses the JVM's JIT compilation, the proper comparison is
 with PyPy - which amazingly, does a better job ; it runs 4.6x faster
 than CPython (almost 2x faster than Clojure).
 
-**Update:** Added use of [ShedSkin](https://github.com/shedskin/shedskin).
-Since I got interested in speed results, I tried using ShedSkin;
-which in the end runs 40% faster than PyPy, or put simply, executes
-the same Python code 7x times faster than CPython (3x faster than Clojure).
-Very impressive.
+**Update:** Added use of [ShedSkin](https://github.com/shedskin/shedskin),
+since I got interested in speed results... It runs 40% faster than PyPy,
+or put simply, executes the same Python code 7x times faster than CPython
+(that is, 3x faster than Clojure)! Very impressive.
 
 **Update:** But this experiment wasn't really about speed - it was about my desire
 to play with Lisps again. So I added an [implementation](contrib/HyLang/hexspeak.hy)
