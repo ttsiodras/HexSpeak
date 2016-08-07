@@ -361,7 +361,7 @@ boxplot:	|bench
 # Cleanup
 
 clean:
-	rm -rf ${TARGET_CLOJURE} ${TARGET_JAVA} ${TARGET_SCALA}
+	rm -rf ${TARGET_CLOJURE} ${TARGET_JAVA} contrib/Scala/*class
 	$(MAKE) -C contrib/HexSpeak-C++/ CFG=release clean
 
 .PHONY:	bench clean test benchPython benchPyPy benchClojure benchJava benchCPP
