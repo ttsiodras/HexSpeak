@@ -21,12 +21,13 @@
   length, and a vector is much faster than a hashmap (which is what
   is returned by group-by below). This function uses good-words
   to generate the list of valid words, and then arranges them into
-  a neat vector:
+  a neat map: 
 
-  [['a'] [] ['bee', 'fed', ...] ['dead', ...]]
+  1 -> ['a']
+  3 -> ['bee', 'fed', ...]
+  4 -> ['dead', ...]
 
-  Valid words of length 1 are first, then valid words of length 2 (none),
-  length 3, 4, etc..."
+  ...etc."
 
   (let [candidates (with-open [rdr (clojure.java.io/reader dictionary-file)]
                      (good-words rdr letters))]
