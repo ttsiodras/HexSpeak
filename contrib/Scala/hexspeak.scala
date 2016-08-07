@@ -6,8 +6,12 @@ object HexSpeak {
 
   def get_words_per_length(dictionaryFile: String, letters: String) = {
     val p = new Regex("^[" ++ letters ++ "]*$")
+    val forbidden = List("aaa", "aba", "abc")
     ("a" :: Source.fromFile(dictionaryFile).getLines().filter(
-      l => l.length > 2 && p.findFirstIn(l).nonEmpty && l != "a").toList).
+      l =>
+        l.length > 2 &&
+        p.findFirstIn(l).nonEmpty &&
+        !forbidden.contains(l)).toList).
     groupBy(_.length)
   }
 

@@ -19,44 +19,14 @@ target length and count them all?
 ## What! Why would you do this? Are you crazy?
 
 Oh, don't get mad - I just wanted to play with Clojure :-)
+And Scala. And HyLang. And C++.
 
-I also did some speed benchmarks... Compared to execution with CPython,
-the Clojure version of the same algorithm runs 2.5x faster (when
-executed in a warmed-up JVM).
+Mostly, I wanted to play :-)
 
-But since Clojure uses the JVM's JIT compilation, the proper comparison is
-with PyPy - which amazingly, does a better job ; it runs 4.6x faster
-than CPython (almost 2x faster than Clojure).
+I also did some speed benchmarks.
 
-**Update:** Added use of [ShedSkin](https://github.com/shedskin/shedskin),
-since I got interested in speed results... It runs 40% faster than PyPy,
-or put simply, executes the same Python code 7x times faster than CPython
-(that is, 3x faster than Clojure)! Very impressive.
+But let's look at the code first:
 
-**Update:** But this experiment wasn't really about speed - it was about my desire
-to play with Lisps again. So I added an [implementation](contrib/HyLang/hexspeak.hy)
-in [a very Pythonic Lisp (HyLang)](https://github.com/hylang). Hy runs
-my code 3x slower than CPython, but at this point I don't care; it was
-so much fun, playing with it :-) And since there's a hy2py converter,
-it also allowed me to execute the result under PyPy.
-
-**Update:** Added Scala, too - it's almost as fast as Java.
-
-The table below shows the results I get in my laptop from executing my
-implementations (using all the languages and all the tools). They all
-return the same number (3020796) of different phrases of length 14,
-that can be formed from the 'ABCDEF' hex nibbles:
-
-| Language/Tool   | Execution time in ms, to count HexSpeak(14) |
-| --------------- | ------------------------------------------- |
-| C++             |                                    34.96600 |
-| Java            |                                   104.00000 |
-| Scala           |                                   122.00000 |
-| Python/ShedSkin |                                   357.70300 |
-| Python/PyPy     |                                   520.08700 |
-| Clojure         |                                   911.20476 |
-| Python/HyLang   |                                  1467.77487 |
-| Python/CPython  |                                  2432.77812 |
 
 ## Step 1 - collect the candidate words
 
@@ -66,7 +36,7 @@ formed from the selected hex nibbles. They are then arranged
 in a way that allows quick lookups of words for a specific length:
 
 Python:
-
+    ```python
     def get_words_per_length(dictionaryFile, letters):
         words = [[] for _ in range(128)]
         m = re.compile(r'^[' + letters + ']*$')
@@ -79,11 +49,12 @@ Python:
                     words[len(word)].append(word)
         words[1] = ['a']
         return words
-
+    ```
 
 Clojure: *(refactored the logic in two functions - one filters
 the words, another groups them via `group-by` based on length: )*
 
+    ```clojure
     (defn good-words [rdr letters]
       (let [matcher (re-pattern (str "^[" letters "]*$"))
             forbidden #{"aaa" "aba" "abc"}]
@@ -92,18 +63,15 @@ the words, another groups them via `group-by` based on length: )*
                                   (re-matches matcher %)
                                   (not (contains? forbidden %))))))))
 
-    (defn get-words-per-length [letters]
-      (let [input-file "/usr/share/dict/words"
-            candidates (with-open [rdr (clojure.java.io/reader input-file)]
-                         (good-words rdr letters))
-            in-map-form (group-by #(.length ^String %)
-                                  (concat candidates ["a"]))
-            max-length (inc (reduce max (keys in-map-form)))]
-        (into [] (map #(get in-map-form % []) (range max-length)))))
+    (defn get-words-per-length [dictionary-file letters]
+      (let [candidates (with-open [rdr (clojure.java.io/reader dictionary-file)]
+                         (good-words rdr letters))]
+        (group-by #(.length ^String %) (concat candidates ["a"]))))
+    ```
 
-Testing the Clojure code - showing 3- and 4-letter candidate words:
+Testing the Clojure code from the REPL - showing 3- and 4-letter candidate words:
 
-    (get (get-words-per-length "abcdef") 3)
+    (get (get-words-per-length "contrib/words" "abcdef") 3)
     ==> ["ace" "add" "baa" "bad" "bed" "bee" "cab" "cad" "dab" "dad" "deb"
          "def" "ebb" "eff" "fab" "fad" "fed" "fee"]
 
@@ -111,15 +79,20 @@ Testing the Clojure code - showing 3- and 4-letter candidate words:
     ==> ["abbe" "abed" "aced" "babe" "bade" "bead" "beef" "cafe" "caff" "ceca"
      "cede" "dace" "dded" "dead" "deaf" "deed" "face" "fade" "faff" "feed"]
 
-Scala: *(The Force is Strong in the ML family... Both expression-wise and
-execution-speed wise...)*
+Scala: *(Succinct, type-safe... and fast! see below)*
 
+    ```scala
     def get_words_per_length(dictionaryFile: String, letters: String) = {
       val p = new Regex("^[" ++ letters ++ "]*$")
+      val forbidden = List("aaa", "aba", "abc")
       ("a" :: Source.fromFile(dictionaryFile).getLines().filter(
-        l => l.length > 2 && p.findFirstIn(l).nonEmpty && l != "a").toList).
+        l => 
+          l.length > 2 &&
+          p.findFirstIn(l).nonEmpty &&
+          !forbidden.contains(l)).toList).
       groupBy(_.length)
     }
+    ```
 
 Now that the candidate words are there, it's time to assemble them recursively.
 
@@ -187,6 +160,90 @@ All three languages allow for equally succinct implementations.
 
 ## Step 3: Speed!
 
+The table below shows the results I get in my laptop from executing my
+implementations (using all the languages and all the tools). They all
+return the same number (3020796) of different phrases of length 14,
+that can be formed from the 'ABCDEF' hex nibbles:
+
+| Language/Tool      | Execution time in ms, to count HexSpeak(14) |
+| ------------------ | ------------------------------------------- |
+| C++                |                                    34.96600 |
+| Java               |                                   104.00000 |
+| Scala              |                                   122.00000 |
+| Python/ShedSkin    |                                   357.70300 |
+| Python/PyPy        |                                   520.08700 |
+| Clojure            |                                   911.20476 |
+| Python/HyLang/Pypy |                                  1467.77487 |
+| Python/CPython     |                                  2432.77812 |
+
+![Tukey boxplot of performance for the fast ones](https://raw.githubusercontent.com/ttsiodras/HexSpeak/master/contrib/boxplot.png "Tukey boxplot of performance for the fast ones")
+
+Note that this is the exact same algorithm in all cases - a plain recursion
+visiting the *word space* of HexSpeak, in exactly the same order.
+
+### Analysis
+
+#### Clojure/PyPy
+
+Compared to execution with CPython, the Clojure implementation of the
+same algorithm runs 2.5x faster (when executed in a warmed-up JVM).
+But since Clojure uses the JVM's JIT compilation, the proper comparison
+is with [PyPy](http://pypy.org/) - which amazingly, does a better job ;
+it runs 4.7x faster than CPython (almost 2x faster than Clojure).
+
+#### Python/Shedskin
+
+Since I got interested in speed, I then tried [ShedSkin](https://github.com/shedskin/shedskin),
+which converts the Python code to C++. It executed 40% faster than PyPy,
+or put simply, makes the same Python code 7x times faster than CPython
+(that is, 3x faster than Clojure!)
+
+Very impressive result.
+
+#### HyLang
+
+But this experiment wasn't really about speed - it was about my desire
+to play with Lisps again. So I added an [implementation](contrib/HyLang/hexspeak.hy)
+in [a very Pythonic Lisp (HyLang)](https://github.com/hylang). *Hy* run
+the code 3x slower than CPython - but then again, I can't remember the
+last time I had so much fun, playing with a language :-) You see, the most
+troublesome part when fooling around with a language is learning the new
+standard library - but Hy uses Python's... so if you speak Python and you
+know Lisp syntax, you "instantly" speak Hy! :-)
+
+Since it came with hy2py (a .hy to .py converter), it also allowed me to
+execute the result under PyPy - which brought performance decently close
+to Clojure's (50% slower).
+
+#### C++
+
+I also added a C++ implementation to the mix; and since I could
+play with the actual string data there, I switched the `used` container
+to storing the pointers instead of the strings... In CS parlance, I *interned*
+the strings - which made C++ 3 times faster than Java. To be objective,
+though, C++ was also the only language where I had segfaults while coding.
+
+*(easy, correct, fast - pick two)* :-)
+
+#### Java
+
+Don't ask - I was just curious. And it turns out that it runs an order of
+magnitude faster than Clojure (9x) - apparently recursively calling a
+function millions of times is a pattern that is optimized a heck of a lot
+better in Java than it is in Clojure.
+
+#### Scala
+
+Ah, the siren song of the ML family... Once you meet it in any of its forms
+(OCaml, Haskell, F#, Scala), forever it will dominate your destiny...
+Succinct, type-safe... and fast, too - just as fast as Java. Of all the
+`get_words_per_length` implementations, I like Scala's form the most;
+even though I am a complete newb and have almost never used this language
+for anything. I also loved that I could do this coding in the REPL,
+figuring out the APIs on the fly. Best of all worlds? Maybe...
+
+#### How did you benchmark?
+
 I added a `bench` rule in my Makefile, that measures 10 runs of `solve`
 for 14-character long HexSpeak phrases. I used `time.time()` in Python,
 and Clojure's `time` to do the measurements *(but see also section below
@@ -196,78 +253,7 @@ of the 'warm-up' of the HotSpot technology *(the first couple of `solve`
 runs are much slower than the rest, since the JVM figures out the best
 places to JIT at run-time)*.
 
-**UPDATE, two days later**: I also added a Java implementation to the mix.
-Unexpectedly, it runs much faster than Clojure (9x) - apparently recursively
-calling a function millions of times is a pattern that is optimized a lot
-better in Java than it is in Clojure.
-
-**UPDATE, four days later**: I also added a C++ implementation to the mix;
-and since I could play with the actual string data there, I switched
-`used` to using them instead of strings... In CS parlance, I *interned*
-the strings - which made C++ 3 times faster than Java. To be objective,
-though, C++ was also the only language where I had segfaults while coding.
-
-*(easy, correct, fast - pick two)* :-)
-
-**UPDATE, a month later**: I also added a [HyLang](https://github.com/hylang)
-implementation to the mix. HyLang is a Lisp that offers Clojure syntax on top
-of seemless interoperability with Python's standard library; that is,
-a Lisp where I already knew the standard library! It compiles to Python AST
-and serializes the output as Python bytecode - so I executed it with PyPy
-to give it a chance in the benchmarking. It ended up half-way between CPython
-and Clojure. It was also the most fun I've had in years :-)
-
-**UPDATE, two months later**: I added an implementation in Scala. It was 
-unexpectedly easy, doing this - mostly because Scala has a REPL, so I was able
-to figure out the APIs very quickly. And it runs as fast as Java...
-
-Final speed results in my latop:
-
-
-    $ make bench
-    ...
-    Benchmarking C++ (best out of 10 executions)...
-                Min: 34.96600
-
-
-    Benchmarking Java (best out of 10 executions)...
-                Min: 104.00000
-
-
-    Benchmarking Scala (best out of 10 executions)...
-                Min: 122.00000
-
-
-    Benchmarking ShedSkin (best out of 10 executions)...
-                Min: 357.70300
-
-
-    Benchmarking PyPy (best out of 10 executions)...
-                Min: 520.08700
-
-
-    Benchmarking Clojure (best out of 10 executions)...
-                Min: 911.20476
-
-
-    Benchmarking Hy via PyPy (best out of 10 executions)...
-                Min: 1467.77487
-
-
-    Benchmarking Python (best out of 10 executions)...
-                Min: 2432.77812
-
-
-Note that this is the exact same algorithm in all cases - a plain recursion
-visiting the *word space* of HexSpeak, in exactly the same order.
-
-These results more or less match my expectations when I started this
-Clojure experiment... Clojure is much faster than Python, but it's also
-(much!) slower than plain Java. PyPy's performance surprised me (in a
-good way) - and of course, C++ speed is on a class of its own...
-*(with the code being a mutable mayhem of interned pointers to chars)* :-)
-
-## JMH and Criterium
+#### JMH and Criterium
 
 Benchmarking under the JVM can be perilous - the established wisdom
 is that for Java you use
@@ -283,7 +269,15 @@ timing results from JMH and Criterium, and those of the "simple" methods.
 *Keep in mind that in the "simple" methods the algorithm is run 10 times
 and the minimum time is taken.*
 
-## BoxPlot
+### Thoughts on speed
+
+These results more or less match my expectations when I started this
+Clojure experiment... Clojure is faster than CPython, but it's also
+(much!) slower than plain Java. PyPy's performance surprised me (in a
+good way), Scala is awesome (loved both the syntax and the speed!),
+and finally, of course, C++ speed puts it on a class of its own... :-)
+
+### BoxPlot
 
 We can see the spread of the measurements by creating a Tukey boxplot...
 
@@ -308,6 +302,9 @@ Clojure in particular nudges towards an immutable way of working with the data,
 which shields your code from tons of bugs (e.g. contrast
 [this mutation in Java](https://github.com/ttsiodras/HexSpeak/blob/master/contrib/hexspeak.java#L59)
 with [this immutable addition in Clojure](https://github.com/ttsiodras/HexSpeak/blob/master/src/thanassis/hexspeak.clj#L50).
+
+Then again, so does Scala. And the type-safety that comes with it, is absolutely
+a killer feature - enough so that the Python world is now playing catchup with MyPy.
 
 All in all, this was fun - and quite educational. Many thanks to the people
 that provided feedback in [the discussion at Reddit/Clojure](https://www.reddit.com/r/Clojure/comments/4l28go/pitting_clojure_against_python_in_hexspeak/).

@@ -29,11 +29,8 @@
   length 3, 4, etc..."
 
   (let [candidates (with-open [rdr (clojure.java.io/reader dictionary-file)]
-                     (good-words rdr letters))
-        in-map-form (group-by #(.length ^String %)
-                              (concat candidates ["a"]))
-        max-length (inc (reduce max (keys in-map-form)))]
-    (into [] (map #(get in-map-form % []) (range max-length)))))
+                     (good-words rdr letters))]
+    (group-by #(.length ^String %) (concat candidates ["a"]))))
 
 (defn solve
   "Using the list of valid options from our list of words,
