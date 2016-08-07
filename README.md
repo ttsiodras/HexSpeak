@@ -5,7 +5,7 @@
 "HexSpeak" refers to the use of hex nibbles to create words.
 For example:
 
-- Did someone overwrote my magic sentinel value? (`0xDEADBEEF`)
+- Did someone modify my magic sentinel value? (`0xDEADBEEF`)
 - That board's register should return `0xDEADC0DE` by default.
 - Someone `0x0DEFACED` my code!
 - etc.
