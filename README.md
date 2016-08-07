@@ -308,10 +308,12 @@ playing with Lisp syntax again. Didn't do any macros this time :-)
 Clojure in particular nudges towards an immutable way of working with the data,
 which shields your code from tons of bugs (e.g. contrast
 [this mutation in Java](https://github.com/ttsiodras/HexSpeak/blob/master/contrib/hexspeak.java#L59)
-with [this immutable addition in Clojure](https://github.com/ttsiodras/HexSpeak/blob/master/src/thanassis/hexspeak.clj#L50).
+with [this immutable addition in Clojure](https://github.com/ttsiodras/HexSpeak/blob/master/src/thanassis/hexspeak.clj#L47).
 
-Then again, so does Scala. And the type-safety that comes with it, is absolutely
-a killer feature - enough so that the Python world is now playing catchup with MyPy.
+Then again, so does Scala. And the additional static type safety that it brings with it,
+is arguably a huge asset in large codebases and refactorings... Enough so that the
+Python world is now playing catchup with mypy, and Clojure is trying to achieve
+similar results with `clojure.spec` (at run-time, though). 
 
-All in all, this was fun - and quite educational. Many thanks to the people
+Anyway... all in all, this was fun - and quite educational. Many thanks to the people
 that provided feedback in [the discussion at Reddit/Clojure](https://www.reddit.com/r/Clojure/comments/4l28go/pitting_clojure_against_python_in_hexspeak/).
