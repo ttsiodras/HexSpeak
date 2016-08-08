@@ -144,16 +144,13 @@ Scala:
 ```scala
 def solve_recursive_count(words:Map[Int, List[String]], currentLen:Int,
                           used:List[String], targetLength:Int):Unit = {
-    for (i <- 1 to (targetLength - currentLen)) {
-      for(word <- words.getOrElse(i, List())) {
-        if (!used.contains(word)) {
+    for (i <- 1 to (targetLength - currentLen))
+      for(word <- words.getOrElse(i, List()))
+        if (!used.contains(word))
           if (i != targetLength - currentLen)
             solve_recursive_count(words, currentLen + i, word :: used, targetLength)
           else
             cnt += 1
-        }
-      }
-    }
   }
 
 val words = get_words_per_length("../words", "abcdef")
