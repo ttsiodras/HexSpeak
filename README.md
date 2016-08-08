@@ -135,7 +135,7 @@ Clojure: *a `volatile!` is faster than an `atom` (for the counter)*
 (let [counter (volatile! 0) ; faster than atom
       words-per-length (get-words-per-length "abcdef")]
   (do
-    (time (solve words-per-length phrase-length 0 #{} counter))
+    (time (solve words-per-length phrase-length 0 [] counter))
     (printf "Total: %d\n" @counter)))
 ```
 
