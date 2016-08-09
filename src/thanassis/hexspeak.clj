@@ -65,6 +65,6 @@
     (dotimes [n 10]
       (do
         (vreset! counter 0)
-        (time (solve words-per-length phrase-length 0 [] counter))
+        (time (solve words-per-length phrase-length 0 #{} counter))
         (printf "Total: %d\n" @counter)))
         (flush)))
