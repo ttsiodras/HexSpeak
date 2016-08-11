@@ -17,6 +17,7 @@ languages = [
     "timings.shedskin.txt",
     "timings.scala.txt",
     "timings.java.txt",
+    "timings.js.txt",
     "timings.cpp.txt",
 ]
 
