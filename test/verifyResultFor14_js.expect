@@ -6,5 +6,5 @@ spawn -noecho node ./contrib/hexspeak.js
 expect {
   timeout { send_user "\n\033\[31mFailed test...\033\[0m\n"; exit 1 }
   eof { send_user "\n\033\[31mFailed test...\033\[0m\n"; exit 1 }
-  "3020796" { send_user "\n\033\[32mPyPy tested successfully!\033\[0m\n" }
+  "3020796" { send_user "\n\033\[32mJavascript tested successfully!\033\[0m\n" }
 }

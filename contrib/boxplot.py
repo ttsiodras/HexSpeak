@@ -15,9 +15,9 @@ languages = [
     "timings.clojure.txt",
     "timings.pypy.txt",
     "timings.shedskin.txt",
+    "timings.js.txt",
     "timings.scala.txt",
     "timings.java.txt",
-    "timings.js.txt",
     "timings.cpp.txt",
 ]
 
