@@ -243,7 +243,7 @@ benchJS:
 	@mkdir -p results
 	@echo
 	@printf "$(GREEN)Benchmarking Javascript (best out of 10 executions)...$(NO_COLOR)"
-	@bash -c "for i in {1..10} ; do node ./contrib/hexspeak.js; done" | awk '{print $$3; fflush();}' | tee results/timings.js.txt | contrib/stats.py | grep Min
+	@node ./contrib/hexspeak.js | awk '{print $$3; fflush();}' | tee results/timings.js.txt | contrib/stats.py | grep Min
 	@echo
 
 
