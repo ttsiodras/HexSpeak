@@ -11,10 +11,12 @@
   [rdr letters]
   (let [matcher (re-pattern (str "^[" letters "]*$"))
         forbidden #{"aaa" "aba" "abc"}]
-    (doall (->> (line-seq rdr)
-                (filter #(and (> (.length ^String %) 2)
-                              (re-matches matcher %)
-                              (not (contains? forbidden %))))))))
+    (doall
+      (filter
+        #(and (> (.length ^String %) 2)
+              (re-matches matcher %)
+              (not (contains? forbidden %)))
+        (line-seq rdr)))))
 
 (defn get-words-per-length
   "The algorithm below (in solve) needs to access words of the same
