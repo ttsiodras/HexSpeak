@@ -3,12 +3,12 @@
 
 (set! *warn-on-reflection* true)
 
-(defn good-words [rdr letters]
+(defn good-words
   "Reads words from a with-open-ed stream and filters them
   to only include the ones that contain the letters passed.
   It also drops words of length 1 and 2, and drops
   3 'words' of length 3 that exist in /usr/share/dict/words"
-
+  [rdr letters]
   (let [matcher (re-pattern (str "^[" letters "]*$"))
         forbidden #{"aaa" "aba" "abc"}]
     (doall (->> (line-seq rdr)
@@ -16,7 +16,7 @@
                               (re-matches matcher %)
                               (not (contains? forbidden %))))))))
 
-(defn get-words-per-length [dictionary-file letters]
+(defn get-words-per-length
   "The algorithm below (in solve) needs to access words of the same
   length, and a vector is much faster than a hashmap (which is what
   is returned by group-by below). This function uses good-words
@@ -28,7 +28,7 @@
   4 -> ['dead', ...]
 
   ...etc."
-
+  [dictionary-file letters]
   (let [candidates (with-open [rdr (clojure.java.io/reader dictionary-file)]
                      (good-words rdr letters))]
     (group-by #(.length ^String %) (concat candidates ["a"]))))
@@ -47,7 +47,7 @@
           (solve words-per-length target-length (+ phrase-len (inc i))
                  (conj used-words w) counter))))))
 
-(defn -main [& args]
+(defn -main
   "Expects as cmd-line arguments:
 
   - Desired length of phrases (e.g. 8)
@@ -56,7 +56,7 @@
 
   Prints the number of such HexSpeak phrases
   (e.g. 0xADEADBEE - a dead bee - is one of them)"
-
+  [& args]
   (let [phrase-length (Integer. ^String (re-find #"\d+" (nth args 0 4)))
         letters (nth args 1 "abcdef")
         dictionary-file (nth args 2 "/usr/share/dict/words")
