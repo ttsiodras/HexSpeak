@@ -28,6 +28,7 @@ PYTHON3:=$(shell command -v python3 2>/dev/null)
 PYPY3:=$(shell command -v pypy3 2>/dev/null)
 VIRTUALENV3:=$(shell command -v virtualenv3 --version 2>/dev/null)
 SHEDSKIN:=$(shell which shedskin 2>/dev/null)
+NODE:=$(shell which node 2>/dev/null)
 
 ###########################################################
 # This is a clojure experiment - that's our primary target:
@@ -163,6 +164,11 @@ endif
 else
 	@printf "$(YELLOW)You are missing 'javac' - skipping Java benchmark...$(NO_COLOR)"
 endif
+ifdef NODE
+	$(MAKE) benchJS
+else
+	@printf "$(YELLOW)You are missing 'node' - skipping Javascript benchmark...$(NO_COLOR)"
+endif
 ifdef SCALAC
 ifdef SCALA
 	$(MAKE) benchScala
@@ -230,6 +236,14 @@ benchPyPy:
 	@echo
 	@printf "$(GREEN)Benchmarking PyPy (best out of 10 executions)...$(NO_COLOR)"
 	@bash -c "for i in {1..10} ; do pypy3 ./contrib/hexspeak.py 14 abcdef contrib/words ; done" | awk '{print $$3; fflush();}' | tee results/timings.pypy.txt | contrib/stats.py | grep Min
+	@echo
+
+
+benchJS:
+	@mkdir -p results
+	@echo
+	@printf "$(GREEN)Benchmarking Javascript (best out of 10 executions)...$(NO_COLOR)"
+	@node ./contrib/hexspeak.js | awk '{print $$3; fflush();}' | tee results/timings.js.txt | contrib/stats.py | grep Min
 	@echo
 
 
@@ -326,6 +340,11 @@ ifdef JAVAC
 ifdef JAVA
 	@./test/verifyResultFor14_java.expect | grep -v --line-buffered Elapsed | grep -v --line-buffered 3020796
 endif
+endif
+ifdef NODE
+	@./test/verifyResultFor14_js.expect | grep -v --line-buffered Elapsed | grep -v --line-buffered 3020796
+else
+	@printf "$(YELLOW)You are missing 'node' - skipping Javascript test...$(NO_COLOR)"
 endif
 ifdef SCALAC
 ifdef JAVA
