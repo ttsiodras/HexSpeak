@@ -180,8 +180,6 @@ that can be formed from the 'ABCDEF' hex nibbles:
 | Python/HyLang/Pypy |                                  1467.77487 |
 | Python/CPython     |                                  2432.77812 |
 
-![Tukey boxplot of performance for the fast ones](https://raw.githubusercontent.com/ttsiodras/HexSpeak/master/contrib/boxplot.png "Tukey boxplot of performance for the fast ones")
-
 Note that this is the exact same algorithm in all cases - a plain recursion
 visiting the *word space* of HexSpeak, in exactly the same order.
 
@@ -286,6 +284,8 @@ and finally, of course, C++ speed puts it on a class of its own... :-)
 We can see the spread of the measurements by creating a Tukey boxplot...
 
     $ make boxplot
+
+**Oct 2018: Updated timings**:
 
 ![Tukey boxplot of performance for the fast ones](https://raw.githubusercontent.com/ttsiodras/HexSpeak/master/contrib/boxplot.png "Tukey boxplot of performance for the fast ones")
 
