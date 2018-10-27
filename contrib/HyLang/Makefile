@@ -26,4 +26,4 @@ hexspeak.py:	hexspeak.hy
 bench:	hexspeak.py | hylang hy
 	@mkdir -p ../../results
 	@printf "$(GREEN)Benchmarking Hy via PyPy (best out of 10 executions)...$(NO_COLOR)"
-	@bash -c "cd ${MAKEFILE_FOLDER} && . ${MAKEFILE_FOLDER}/hylang/bin/activate && for i in {1..10} ; do python hexspeak.py 14 abcdef ../words ; done" | awk '{print $$4; fflush();}' | tee ${MAKEFILE_FOLDER}/../../results/timings.hylang.txt | ${MAKEFILE_FOLDER}/../../contrib/stats.py | grep Min
+	@bash -c "cd ${MAKEFILE_FOLDER} && . ${MAKEFILE_FOLDER}/hylang/bin/activate && for i in {1..10} ; do python hexspeak.py 14 abcdef ../words ; done" | awk '{print $$4; fflush();}' | tee ${MAKEFILE_FOLDER}/../../results/timings.hy_pypy.txt | ${MAKEFILE_FOLDER}/../../contrib/stats.py | grep Min

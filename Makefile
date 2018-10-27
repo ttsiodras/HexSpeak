@@ -219,7 +219,7 @@ benchPython:
 	@mkdir -p results
 	@echo
 	@printf "$(GREEN)Benchmarking Python (best out of 10 executions)...$(NO_COLOR)"
-	@bash -c "for i in {1..10} ; do ./contrib/hexspeak.py 14 abcdef contrib/words ; done" | awk '{print $$3; fflush();}' | tee results/timings.python.txt | contrib/stats.py | grep Min
+	@bash -c "for i in {1..10} ; do ./contrib/hexspeak.py 14 abcdef contrib/words ; done" | awk '{print $$3; fflush();}' | tee results/timings.cpython.txt | contrib/stats.py | grep Min
 	@echo
 
 
