@@ -13,10 +13,10 @@ uint32_t counter = 0;
 
 using namespace std;
 
-list<string> getGoodWords(const string& filename)
+list<string> getGoodWords(const string& filename, const string& letters)
 {
     list<string> goodWords;
-    regex pattern("^[abcdef]*$");
+    regex pattern("^["+letters+"]*$");
     ifstream infile(filename);
     string line;
     while(getline(infile, line)) {
@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
     const uint32_t targetLength = atoi(targetLengthStr.c_str());
     const string letters = (argc<3)?"abcdef":argv[2];
     const string wordsFilename = (argc<4)?"../../words":argv[3];
-    auto goodWords = getGoodWords(wordsFilename);
+    auto goodWords = getGoodWords(wordsFilename, letters);
     vector<vector<const char *>> wordsByLength(128);
     for(const auto& word: goodWords)
         wordsByLength[word.length()].push_back(word.c_str());
