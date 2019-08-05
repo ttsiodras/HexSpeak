@@ -8,6 +8,7 @@ Couldn't resist! Read about hylang here:
     http://docs.hylang.org/en/latest/
 
 """
+(require [hy.contrib.walk [let]])
 (import re sys time)
 
 (defn good-words [rdr letters]
@@ -38,11 +39,11 @@ Couldn't resist! Read about hylang here:
 
   (let [candidates (list (good-words dictionary-file letters))
         sorted-candidates (sorted candidates :key (fn [x] (len x)))
-        grouped (group-by (cons "a" sorted-candidates) (fn [x] (len x)))
+        grouped (group-by (+ ["a"] sorted-candidates) (fn [x] (len x)))
         in-map-form (dict
-                      (list-comp
-                        (, (get kv 0) (list (get kv 1)))
-                        [kv grouped]))]
+                      (lfor
+                        kv grouped
+                        (, (get kv 0) (list (get kv 1)))))]
     (list (map (fn [i] (.get in-map-form (inc i) [])) (range 128)))))
 
 (setv counter 0)

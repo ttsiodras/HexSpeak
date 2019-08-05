@@ -2,3 +2,5 @@ foo.py
 hexspeak.py
 hy/
 hylang/
+__pycache__
+env
