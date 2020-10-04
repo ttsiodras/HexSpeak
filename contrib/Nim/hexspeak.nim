@@ -4,8 +4,10 @@ import os
 import re
 import times
 import strutils
+import sets
 
 type WordCounts = array[128, seq[string]]
+type UsedWords = HashSet[string]
 
 proc get_words_per_length(dictionaryFile:string, letters:string): WordCounts =
   var regexStr = r"^[" & letters & r"]*$"
@@ -21,16 +23,18 @@ proc get_words_per_length(dictionaryFile:string, letters:string): WordCounts =
 
 
 proc solve_recursive_count(
-    words: WordCounts, currentLen:int, used:seq[string], targetLength:int, cnt:int):int =
+    words: WordCounts, currentLen:int, used:ref UsedWords, targetLength:int, cnt:int):int =
   var cnt = cnt
   # echo "[-] currentLen:", currentLen, ", cnt:", cnt, ", used:", used.join(",")
   for i in countup(1, targetLength - currentLen):
     for word in words[i]:
-      if word in used:
+      if word in used[]:
         continue
       if i != targetLength - currentLen:
+        used[].incl(word)
         cnt = solve_recursive_count(
-          words, currentLen + i, used & @[word], targetLength, cnt)
+          words, currentLen + i, used, targetLength, cnt)
+        used[].excl(word)
       else:
         inc cnt
   cnt
@@ -49,11 +53,9 @@ proc main =
     letters = paramStr(2).replace("0", "o").replace("1", "il")
     dictionaryFile = paramStr(3)
   var words = get_words_per_length(dictionaryFile, letters)
-  # for i in countup(1, 127):
-  #   if len(words[i]) != 0:
-  #     echo "[-]", i, ":", join(words[i], ",")
+  var used = new UsedWords
   var start = now()
-  var cnt = solve_recursive_count(words, 0, @[], targetLength, 0)
+  var cnt = solve_recursive_count(words, 0, used, targetLength, 0)
   var stop = now()
   echo cnt, " in ", (stop-start).inMilliseconds, " ms."
 
