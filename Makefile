@@ -23,6 +23,7 @@ JAVA:=$(shell command -v java 2>/dev/null)
 JAVAC:=$(shell command -v javac 2>/dev/null)
 SCALAC:=$(shell command -v scalac 2>/dev/null)
 SCALA:=$(shell command -v scala 2>/dev/null)
+NIM:=$(shell command -v nim 2>/dev/null)
 GXX:=$(shell command -v g++ 2>/dev/null)
 PYTHON3:=$(shell command -v python3 2>/dev/null)
 PYPY3:=$(shell command -v pypy3 2>/dev/null)
@@ -83,6 +84,20 @@ ifndef GXX
 endif
 	@printf "$(GREEN)Compiling C++ code...$(NO_COLOR)"
 	$(MAKE) -C contrib/HexSpeak-C++/ CFG=release
+
+########################
+# And also with Nim
+
+TARGET_NIM_DIR=contrib/Nim
+TARGET_NIM=${TARGET_NIM_DIR}/hexspeak
+
+${TARGET_NIM}:	contrib/Nim/hexspeak.nim
+ifndef NIM
+	$(error "You appear to be missing 'nim' (NIM compiler)")
+endif
+	@printf "$(GREEN)Compiling NIM code...$(NO_COLOR)"
+	$(MAKE) -C contrib/Nim
+
 
 ########################
 # And also with Shedskin
@@ -178,6 +193,13 @@ endif
 else
 	@printf "$(YELLOW)You are missing 'scalac' - skipping Scala benchmark...$(NO_COLOR)"
 endif
+ifdef NIM
+	echo WTF1
+	$(MAKE) benchNim
+else
+	echo WTF2
+	@printf "$(YELLOW)You are missing 'nim' - skipping Nim benchmark...$(NO_COLOR)"
+endif
 ifdef SHEDSKIN
 	$(MAKE) benchShedSkin
 else
@@ -236,6 +258,14 @@ benchPyPy:
 	@echo
 	@printf "$(GREEN)Benchmarking PyPy (best out of 10 executions)...$(NO_COLOR)"
 	@bash -c "for i in {1..10} ; do pypy3 ./contrib/hexspeak.py 14 abcdef contrib/words ; done" | awk '{print $$3; fflush();}' | tee results/timings.pypy.txt | contrib/stats.py | grep Min
+	@echo
+
+
+benchNim:	| ${TARGET_NIM}
+	@mkdir -p results
+	@echo
+	@printf "$(GREEN)Benchmarking Nim (best out of 10 executions)...$(NO_COLOR)"
+	@bash -c "for i in {1..10} ; do ./contrib/Nim/hexspeak 14 abcdef contrib/words ; done" | awk '{print $$3; fflush();}' | tee results/timings.nim.txt | contrib/stats.py | grep Min
 	@echo
 
 

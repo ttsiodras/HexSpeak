@@ -14,9 +14,10 @@ import matplotlib.pyplot as plt
 languages = [
     "timings.cpython.txt",
     "timings.clojure.txt",
+    "timings.shedskin.txt",
     "timings.hy_pypy.txt",
     "timings.pypy.txt",
-    "timings.shedskin.txt",
+    "timings.nim.txt",
     "timings.scala.txt",
     "timings.js.txt",
     "timings.java.txt",

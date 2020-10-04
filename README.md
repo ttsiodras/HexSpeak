@@ -174,6 +174,7 @@ that can be formed from the 'ABCDEF' hex nibbles:
 | C++                |                                    34.96600 |
 | Java               |                                   104.00000 |
 | Scala              |                                   122.00000 |
+| Nim                |                                   232.00000 |
 | Python/ShedSkin    |                                   357.70300 |
 | Python/PyPy        |                                   520.08700 |
 | Clojure            |                                   911.20476 |
