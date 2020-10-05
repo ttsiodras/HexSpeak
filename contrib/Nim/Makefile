@@ -1,2 +1,5 @@
-hexspeak:	hexspeak.nim
-	nim c -d:release $<
+hexspeak:	hexspeak.nim Makefile
+	nim c -d:release --opt:speed $<
+
+clean:
+	rm hexspeak
