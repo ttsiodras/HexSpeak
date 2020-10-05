@@ -4,10 +4,9 @@ import os
 import re
 import times
 import strutils
-import sets
 
 type WordCounts = array[128, seq[ptr string]]
-type UsedWords = HashSet[ptr string]
+type UsedWords = array[256, ptr string]
 
 # Probably violating Nim here: to optimize the speed of execution,
 # like in C++, I "intern" the strings. Basically, when loading the
@@ -23,6 +22,7 @@ type UsedWords = HashSet[ptr string]
 # all Nim's tenets by doing this :-) Am I? (see the uses of "addr"
 # below to take the addresses of strings in this sequence.
 var allWords : seq[string]
+var usedWordsSlot : int
 
 proc get_words_per_length(dictionaryFile:string, letters:string): WordCounts =
   var regexStr = r"^[" & letters & r"]*$"
@@ -45,13 +45,19 @@ proc solve_recursive_count(
   # echo "[-] currentLen:", currentLen, ", cnt:", cnt, ", used:", used.join(",")
   for i in countup(1, targetLength - currentLen):
     for word in words[i]:
-      if word in used[]:
+      var j = 0
+      while j < usedWordsSlot:
+        if used[j] == word:
+          break
+        inc(j)
+      if j != usedWordsSlot:
         continue
       if i != targetLength - currentLen:
-        used[].incl(word)
+        used[usedWordsSlot] = word
+        inc(usedWordsSlot)
         cnt = solve_recursive_count(
           words, currentLen + i, used, targetLength, cnt)
-        used[].excl(word)
+        dec(usedWordsSlot)
       else:
         inc cnt
   cnt
