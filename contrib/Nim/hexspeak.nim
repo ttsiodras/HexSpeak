@@ -6,20 +6,37 @@ import times
 import strutils
 import sets
 
-type WordCounts = array[128, seq[string]]
-type UsedWords = HashSet[string]
+type WordCounts = array[128, seq[ptr string]]
+type UsedWords = HashSet[ptr string]
+
+# Probably violating Nim here: to optimize the speed of execution,
+# like in C++, I "intern" the strings. Basically, when loading the
+# words, I store them in this global container - and in the UsedWords
+# container (mutated during the recursion below) I maintain the
+# *pointers* to the words - instead of the words themselves. This
+# means that when checking whether the container has seen a word before
+# or not, the comparison compares pointers instead of strings.
+#
+# Much faster!
+#
+# But if a GC happens, we're hosed - ergo, why I believe I am violating
+# all Nim's tenets by doing this :-) Am I? (see the uses of "addr"
+# below to take the addresses of strings in this sequence.
+var allWords : seq[string]
 
 proc get_words_per_length(dictionaryFile:string, letters:string): WordCounts =
   var regexStr = r"^[" & letters & r"]*$"
   var m = re(regexStr)
+  allwords.add("a")
+  var p_a = addr allwords[0]
   for line in open(dictionaryFile).lines():
     var word = line.strip()
     if len(word) > 2 and match(word, m):
       if word in ["aaa", "aba", "abc"]:
         continue
-      if not (word in result[len(word)]):
-        result[len(word)].add(word)
-  result[1].add("a")
+      allWords.add(word)
+      result[len(word)].add(addr allWords[^1])
+  result[1].add(p_a)
 
 
 proc solve_recursive_count(
