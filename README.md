@@ -170,16 +170,17 @@ return the same number (3020796) of different phrases of length 14,
 that can be formed from the 'ABCDEF' hex nibbles:
 
 | Language/Tool      | Execution time in ms, to count HexSpeak(14) |
-| ------------------ | ------------------------------------------- |
-| C++                |                                    34.96600 |
-| Java               |                                   104.00000 |
-| Scala              |                                   122.00000 |
-| Nim                |                                   232.00000 |
-| Python/ShedSkin    |                                   357.70300 |
-| Python/PyPy        |                                   520.08700 |
-| Clojure            |                                   911.20476 |
-| Python/HyLang/Pypy |                                  1467.77487 |
-| Python/CPython     |                                  2432.77812 |
+| ------------------ | ----------------------------------------- |
+| C++                |                                    34.920 |
+| Java               |                                   105.000 |
+| Scala              |                                   129.000 |
+| Javascript/NodeJS  |                                   136.000 |
+| Nim                |                                   212.000 |
+| Python/PyPy        |                                   348.324 |
+| Python/HyLang/Pypy |                                   361.314 |
+| Python/ShedSkin    |                                   414.723 |
+| Clojure            |                                   959.204 |
+| Python/CPython     |                                  1502.678 |
 
 Note that this is the exact same algorithm in all cases - a plain recursion
 visiting the *word space* of HexSpeak, in exactly the same order.
@@ -189,19 +190,18 @@ visiting the *word space* of HexSpeak, in exactly the same order.
 #### Clojure/PyPy
 
 Compared to execution with CPython, the Clojure implementation of the
-same algorithm runs 2.5x faster (when executed in a warmed-up JVM).
+same algorithm runs 1.5x faster (when executed in a warmed-up JVM).
 But since Clojure uses the JVM's JIT compilation, the proper comparison
 is with [PyPy](http://pypy.org/) - which amazingly, does a better job ;
-it runs 4.7x faster than CPython (almost 2x faster than Clojure).
+it runs 4.3x faster than CPython (almost 3x faster than Clojure).
 
 #### Python/Shedskin
 
 Since I got interested in speed, I then tried [ShedSkin](https://github.com/shedskin/shedskin),
-which converts the Python code to C++. It executed 40% faster than PyPy,
-or put simply, makes the same Python code 7x times faster than CPython
-(that is, 3x faster than Clojure!)
+which converts the Python code to C++. This used to run 40% faster than PyPy,
+but as of 2021/05, the optimisations in PyPy now beat ShedSkin.
 
-Very impressive result.
+Still, very impressive result *(compared to CPython)*.
 
 #### HyLang
 
@@ -215,8 +215,8 @@ standard library - but Hy uses Python's... so if you speak Python and you
 know Lisp syntax, you "instantly" speak Hy! :-)
 
 Since it came with hy2py (a .hy to .py converter), it also allowed me to
-execute the result under PyPy - which brought performance decently close
-to Clojure's (50% slower).
+execute the result under PyPy - which brought incredible performance with
+it, running 2.65x faster than Clojure.
 
 #### C++
 
@@ -231,9 +231,9 @@ though, C++ was also the only language where I had segfaults while coding.
 #### Java
 
 Don't ask - I was just curious. And it turns out that it runs an order of
-magnitude faster than Clojure (9x) - apparently recursively calling a
+magnitude faster than Clojure (9x). Apparently recursively calling a
 function millions of times is a pattern that is optimized a heck of a lot
-better in Java than it is in Clojure.
+better in Java than it is in Clojure...
 
 #### Scala
 
@@ -286,7 +286,7 @@ We can see the spread of the measurements by creating a Tukey boxplot...
 
     $ make boxplot
 
-**Oct 2018: Updated timings**:
+**Apr 2021: Updated timings**:
 
 ![Tukey boxplot of performance for the fast ones](https://raw.githubusercontent.com/ttsiodras/HexSpeak/master/contrib/boxplot.png "Tukey boxplot of performance for the fast ones")
 
@@ -299,9 +299,8 @@ I liked playing with Clojure, and loved playing with HyLang (since I didn't have
 to lookup any standard library - I already know Python's). To be honest, I have
 [a soft spot for all Lisps](https://www.thanassis.space/score4.html#lisp)
 so it was interesting to fiddle with them again. And even though this benchmark
-reminded me that *there's no free lunch* (i.e. Clojure is slower than Java,
-HyLang is slower than PyPy (and even more so for ShedSkin), still, I enjoyed
-playing with Lisp syntax again. Didn't do any macros this time :-)
+reminded me that *there's no free lunch* (i.e. Clojure is slower than Java),
+I enjoyed playing with Lisp syntax again. Didn't do any macros this time :-)
 
 Clojure in particular nudges towards an immutable way of working with the data,
 which shields your code from tons of bugs (e.g. contrast
