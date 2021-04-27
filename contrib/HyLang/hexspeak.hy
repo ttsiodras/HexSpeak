@@ -9,7 +9,7 @@ Couldn't resist! Read about hylang here:
 
 """
 (require [hy.contrib.walk [let]])
-(import re sys time)
+(import re sys time itertools)
 
 (defn good-words [rdr letters]
   "Reads words from a with-open-ed stream and filters them
@@ -39,7 +39,7 @@ Couldn't resist! Read about hylang here:
 
   (let [candidates (list (good-words dictionary-file letters))
         sorted-candidates (sorted candidates :key (fn [x] (len x)))
-        grouped (group-by (+ ["a"] sorted-candidates) (fn [x] (len x)))
+        grouped (itertools.groupby (+ ["a"] sorted-candidates) (fn [x] (len x)))
         in-map-form (dict
                       (lfor
                         kv grouped
@@ -62,7 +62,7 @@ Couldn't resist! Read about hylang here:
             (setv counter (inc counter)))
         (solve words-per-length target-length (+ phrase-len (inc i)) (+ used-words [w])))))))
 
-(defmain [&rest args]
+(defmain []
   "Expects as cmd-line arguments:
 
   - Desired length of phrases (e.g. 8)
@@ -71,9 +71,9 @@ Couldn't resist! Read about hylang here:
 
   Prints the number of such HexSpeak phrases
   (e.g. 0xADEADBEE - a dead bee - is one of them)"
-  (let [phrase-length (int (nth args 1 "8"))
-        letters (nth args 2 "abcdef")
-        dictionary-file (nth args 3 "/usr/share/dict/words")
+  (let [phrase-length (int (get sys.argv 1))
+        letters (get sys.argv 2)
+        dictionary-file (get sys.argv 3)
         words-per-length (get-words-per-length dictionary-file letters)]
     (for [i (range 1)]
       (do
